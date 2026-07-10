@@ -92,8 +92,8 @@ services:
     #   - "80:80"
     environment:
       TZ: Asia/Jakarta
-      VITE_API_URL: http://localhost:8000/api
-      VITE_WS_URL: ws://localhost:6001
+      VITE_API_URL: https://patriot.insamo.id/api
+      VITE_WS_URL: wss://patriot.insamo.id/ws
     depends_on:
       - backend
     networks:
@@ -104,14 +104,13 @@ services:
     image: node:18-alpine
     container_name: patriot_websocket_prod
     restart: always
-    ports:
-      - "6001:6001"
     volumes:
       - ./backend:/app
     working_dir: /app
     command: node websocket-server.js
     networks:
       - patriot-prod-network
+      - web
 
 networks:
   patriot-prod-network:
