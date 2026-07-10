@@ -1,0 +1,7 @@
+- [x] M-EWS CRUD Backend
+  - [x] Update MewsScreeningService with CRUD operations
+  - [x] Update MewsScreeningController with CRUD endpoints
+  - [x] Add routes in api.php
+- [x] M-EWS CRUD Frontend
+  - [x] Update api.js with CRUD methods
+  - [x] Modify MewsBuilder.jsx to support editing existing templates

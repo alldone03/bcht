@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: patriot_db_prod
+    restart: always
+    environment:
+      MYSQL_DATABASE: patriot_chatbot_prod
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data_prod:/var/lib/mysql
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    container_name: patriot_backend_prod
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=patriot_chatbot_prod
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-""}
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: patriot_frontend_prod
+    restart: always
+    ports:
+      - "80:80"
+    environment:
+      - VITE_API_URL=http://localhost:8000/api
+    depends_on:
+      - backend
+
+  llm_mock:
+    image: python:3.10-slim
+    container_name: patriot_llm_mock_prod
+    restart: always
+    ports:
+      - "5000:5000"
+    command: >
+      python -c "
+      from http.server import HTTPServer, BaseHTTPRequestHandler
+      import json
+
+      class MockLLMHandler(BaseHTTPRequestHandler):
+          def do_POST(self):
+              content_length = int(self.headers['Content-Length'])
+              post_data = self.rfile.read(content_length)
+              req = json.loads(post_data.decode('utf-8'))
+              prompt = req.get('message', '')
+              
+              # Return a simulated medical LLM response
+              response_text = f'Simulated LLM Diagnosis Assistant: I received your query regarding \'{prompt}\'. Clinically, you should consult with Dr. Jane Smith. Maintain hydration and track your symptoms.'
+              
+              self.send_response(200)
+              self.send_header('Content-Type', 'application/json')
+              self.end_headers()
+              self.wfile.write(json.dumps({'reply': response_text}).encode('utf-8'))
+
+      server = HTTPServer(('0.0.0.0', 5000), MockLLMHandler)
+      print('Mock LLM server running on port 5000...')
+      server.serve_forever()
+      "
+
+volumes:
+  mysql_data_prod:
