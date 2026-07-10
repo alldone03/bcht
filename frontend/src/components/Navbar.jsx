@@ -10,7 +10,7 @@ export default function Navbar({ currentUser, onLogout }) {
   return (
     <div className="navbar bg-base-100 shadow-md px-4 md:px-8 sticky top-0 z-50 transition-all duration-300">
       <div className="flex-1">
-        <a 
+        <a
           className="flex items-center gap-2 cursor-pointer group"
           onClick={() => navigate(currentUser ? '/dashboard' : '/')}
         >
@@ -25,7 +25,7 @@ export default function Navbar({ currentUser, onLogout }) {
 
       <div className="flex-none gap-2">
         {/* Theme Controller */}
-        <button 
+        {/* <button 
           onClick={toggleTheme} 
           className="btn btn-ghost btn-circle"
           title={`Switch to ${theme === 'emerald' ? 'Dark' : 'Light'} Mode`}
@@ -35,7 +35,7 @@ export default function Navbar({ currentUser, onLogout }) {
           ) : (
             <Sun className="w-5 h-5 text-warning" />
           )}
-        </button>
+        </button> */}
 
         {currentUser ? (
           <div className="dropdown dropdown-end">
@@ -72,14 +72,14 @@ export default function Navbar({ currentUser, onLogout }) {
           </div>
         ) : (
           <div className="flex gap-2">
-            <button 
-              onClick={() => navigate('/login')} 
+            <button
+              onClick={() => navigate('/login')}
               className="btn btn-ghost btn-sm text-neutral"
             >
               Login
             </button>
-            <button 
-              onClick={() => navigate('/register')} 
+            <button
+              onClick={() => navigate('/register')}
               className="btn btn-primary btn-sm rounded-lg"
             >
               Daftar

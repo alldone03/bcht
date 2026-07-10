@@ -20,6 +20,7 @@ export default function Sidebar({ role, activeTab, setActiveTab }) {
     DOKTER: [
       { id: 'mews-submissions', name: 'Hasil M-EWS', icon: ClipboardList },
       { id: 'mews-builder', name: 'Builder M-EWS', icon: FilePlus },
+      { id: 'mews-chats', name: 'Supervisi Chat', icon: MessageSquare }
     ],
     PESERTA: [
       { id: 'mews', name: 'Screening M-EWS', icon: ClipboardList },

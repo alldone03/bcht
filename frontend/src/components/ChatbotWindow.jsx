@@ -8,6 +8,9 @@ export default function ChatbotWindow({ user }) {
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [polling, setPolling] = useState(false);
+  const [llmActive, setLlmActive] = useState(false);
+  const [socketConnected, setSocketConnected] = useState(false);
   const messagesEndRef = useRef(null);
 
   // Fetch all chat sessions on load
@@ -23,14 +26,129 @@ export default function ChatbotWindow({ user }) {
     }
   };
 
+  const checkStatus = async () => {
+    if (socketConnected) return; // skip polling if WebSocket is active
+    try {
+      const res = await api.chatGetLlmStatus();
+      setLlmActive(res.active);
+    } catch (e) {
+      setLlmActive(false);
+    }
+  };
+
   useEffect(() => {
     loadSessions();
+    checkStatus();
   }, [user]);
+
+  // Polling for LLM Status (fallback if WebSocket is down)
+  useEffect(() => {
+    if (socketConnected) return;
+    const interval = setInterval(checkStatus, 5000);
+    return () => clearInterval(interval);
+  }, [socketConnected]);
+
+  // WebSocket Connection & Real-Time Sync
+  useEffect(() => {
+    if (!activeSession) {
+      setSocketConnected(false);
+      return;
+    }
+
+    const wsUrl = import.meta.env.VITE_WS_URL || 'ws://localhost:6001';
+    let socket;
+    let reconnectTimeout;
+
+    const connect = () => {
+      socket = new WebSocket(wsUrl);
+
+      socket.onopen = () => {
+        console.log('[WS] Connected to WebSocket server');
+        setSocketConnected(true);
+        socket.send(JSON.stringify({ type: 'subscribe', sessionId: activeSession.id }));
+      };
+
+      socket.onmessage = (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+          const { event: wsEvent, data } = payload;
+          
+          if (wsEvent === 'llm_status') {
+            setLlmActive(data.active);
+          } else if (wsEvent === 'message_created') {
+            setMessages(prev => {
+              // Remove temporary optimistic bubble if it matches the received message content and role
+              const filtered = prev.filter(m => !(m.role === data.role && m.message === data.message && typeof m.id === 'number' && String(m.id).length > 10));
+              if (filtered.some(m => m.id === data.id)) return prev;
+              return [...filtered, data];
+            });
+            setPolling(false);
+            setLoading(false);
+          } else if (wsEvent === 'message_updated') {
+            setMessages(prev => prev.map(m => m.id === data.id ? data : m));
+          } else if (wsEvent === 'message_deleted') {
+            setMessages(prev => prev.filter(m => m.id !== data.id));
+          }
+        } catch (err) {
+          console.error('[WS] Failed to parse message', err);
+        }
+      };
+
+      socket.onclose = () => {
+        console.warn('[WS] Connection closed, retrying in 3s...');
+        setSocketConnected(false);
+        reconnectTimeout = setTimeout(connect, 3000);
+      };
+
+      socket.onerror = (err) => {
+        console.error('[WS] Socket error', err);
+        socket.close();
+      };
+    };
+
+    connect();
+
+    return () => {
+      if (socket) socket.close();
+      if (reconnectTimeout) clearTimeout(reconnectTimeout);
+    };
+  }, [activeSession]);
+
+  // Polling for queue responses (fallback if socket is down)
+  useEffect(() => {
+    if (socketConnected) {
+      setPolling(false);
+      return;
+    }
+    let pollInterval;
+    const lastMsg = messages[messages.length - 1];
+    if (lastMsg && lastMsg.role === 'USER' && activeSession) {
+      setPolling(true);
+      pollInterval = setInterval(async () => {
+        try {
+          const msgs = await api.getChatMessages(activeSession.id);
+          const newLast = msgs[msgs.length - 1];
+          if (newLast && newLast.role === 'ASSISTANT') {
+            setMessages(msgs);
+            setPolling(false);
+            clearInterval(pollInterval);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      }, 2000);
+    } else {
+      setPolling(false);
+    }
+    return () => {
+      if (pollInterval) clearInterval(pollInterval);
+    };
+  }, [messages, activeSession, socketConnected]);
 
   // Auto scroll
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
+  }, [messages, loading, polling]);
 
   const handleSelectSession = async (session) => {
     setActiveSession(session);
@@ -89,11 +207,14 @@ export default function ChatbotWindow({ user }) {
 
     try {
       const updatedMessages = await api.sendChatMessage(activeSession.id, userMsg);
-      setMessages(updatedMessages);
+      if (!socketConnected) {
+        setMessages(updatedMessages);
+        setLoading(false);
+      }
     } catch (err) {
       console.error(err);
-    } finally {
       setLoading(false);
+      setMessages(prev => prev.filter(m => m.id !== userBubble.id));
     }
   };
 
@@ -165,6 +286,22 @@ export default function ChatbotWindow({ user }) {
                   <p className="text-[9px] text-neutral-500 uppercase font-bold tracking-wider">{activeSession.llm_model}</p>
                 </div>
               </div>
+              
+              {/* Connection & LLM Status Indicator */}
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5 bg-base-200/50 px-2.5 py-1 rounded-xl border border-base-200/60">
+                  <span className={`w-2 h-2 rounded-full ${socketConnected ? 'bg-green-500' : 'bg-yellow-500 animate-pulse'}`} />
+                  <span className="text-[9px] font-bold text-neutral-600">
+                    Real-time: {socketConnected ? 'AKTIF' : 'POLLING'}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5 bg-base-200/50 px-2.5 py-1 rounded-xl border border-base-200/60">
+                  <span className={`w-2 h-2 rounded-full ${llmActive ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`} />
+                  <span className="text-[9px] font-bold text-neutral-600">
+                    LLM Server: {llmActive ? 'AKTIF' : 'OFFLINE'}
+                  </span>
+                </div>
+              </div>
             </div>
 
             {/* Chat Message Stream */}
@@ -181,7 +318,7 @@ export default function ChatbotWindow({ user }) {
                   </div>
                 </div>
               ))}
-              {loading && (
+              {(loading || polling) && (
                 <div className="chat chat-start">
                   <div className="chat-image avatar placeholder">
                     <div className="w-8 rounded-full bg-neutral text-neutral-content">

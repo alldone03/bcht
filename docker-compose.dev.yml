@@ -29,6 +29,7 @@ services:
       - DB_USERNAME=root
       - DB_PASSWORD=root
       - GEMINI_API_KEY=${GEMINI_API_KEY:-""}
+      - WEBSOCKET_BROADCAST_URL=http://websocket:6001/broadcast
     volumes:
       - ./backend:/var/www
     depends_on:
@@ -80,6 +81,17 @@ services:
       print('Mock LLM server running on port 5000...')
       server.serve_forever()
       "
+
+  websocket:
+    image: node:18-alpine
+    container_name: patriot_websocket_dev
+    restart: always
+    ports:
+      - "6001:6001"
+    volumes:
+      - ./backend:/app
+    working_dir: /app
+    command: node websocket-server.js
 
 volumes:
   mysql_data_dev:

@@ -1,5 +1,16 @@
 import { getDb, saveDb } from './mockDb';
 
+const originalFetch = window.fetch;
+const fetch = async (...args) => {
+  const res = await originalFetch(...args);
+  if (res.status === 401) {
+    localStorage.removeItem('pt_token');
+    localStorage.removeItem('pt_user');
+    window.location.href = '/';
+  }
+  return res;
+};
+
 // Handle API requests, falling back to mockDb if Laravel backend is not running.
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
@@ -388,11 +399,19 @@ export const api = {
       created_at: new Date().toISOString()
     });
 
-    const myResults = db.results.filter(r => r.participant_id === cur.id);
+    const myResults = db.mewsResults?.filter(r => {
+      const sess = db.mewsSessions?.find(s => s.id === r.session_id);
+      return sess && sess.participant_id === cur.id;
+    }) || [];
     const latest = myResults[myResults.length - 1];
-    let reply = `Halo. Menerima keluhan Anda tentang '${message}'. Silakan konsultasikan langsung dengan dokter kami untuk resep obat.`;
+    let reply = `Halo. Sebagai Patriot AI pendamping Anda, saya menganalisis keluhan Anda mengenai '${message}'.`;
     if (latest) {
-      reply += ` Catatan: kami memperhatikan riwayat GAD-7 terakhir Anda dengan diagnosis ${latest.diagnosis}.`;
+      reply += ` Catatan: Kami memperhatikan hasil screening M-EWS terakhir Anda dengan klasifikasi ${latest.classification} (Skor: ${latest.total_score}). Rekomendasi: "${latest.recommendation}".`;
+      if (latest.doctor_notes) {
+        reply += ` Serta ikuti saran dokter Anda: "${latest.doctor_notes}".`;
+      }
+    } else {
+      reply += ` Silakan lakukan screening kesehatan M-EWS terlebih dahulu agar kami dapat memberikan saran pendampingan yang akurat.`;
     }
 
     db.messages.push({
@@ -945,6 +964,162 @@ export const api = {
       }
       saveDb(db);
     }
+    return { success: true };
+  },
+
+  chatGetLlmStatus: async () => {
+    try {
+      const res = await fetch(`${API_URL}/chat/status`, {
+        headers: getHeaders()
+      });
+      if (res.ok) return await res.json();
+    } catch (e) {}
+
+    return { active: true };
+  },
+
+  chatGetSupervisionSessions: async () => {
+    try {
+      const res = await fetch(`${API_URL}/chat/supervision/sessions`, {
+        headers: getHeaders()
+      });
+      if (res.ok) return await res.json();
+    } catch (e) {}
+
+    const db = getDb();
+    const sessions = db.chatSessions || [];
+    return sessions.map(s => {
+      const u = db.users?.find(usr => usr.id === s.participant_id);
+      return {
+        ...s,
+        participant_name: u ? u.name : 'Peserta',
+        participant_email: u ? u.email : 'peserta@example.com'
+      };
+    });
+  },
+
+  chatGetSupervisionMessages: async (sessionId) => {
+    try {
+      const res = await fetch(`${API_URL}/chat/supervision/sessions/${sessionId}/messages`, {
+        headers: getHeaders()
+      });
+      if (res.ok) return await res.json();
+    } catch (e) {}
+
+    const db = getDb();
+    return db.chatMessages?.filter(m => m.session_id === Number(sessionId)) || [];
+  },
+
+  chatSupervisionCreateSession: async (participantId) => {
+    try {
+      const res = await fetch(`${API_URL}/chat/supervision/sessions`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ participant_id: participantId })
+      });
+      if (res.ok) return await res.json();
+    } catch (e) {}
+
+    const db = getDb();
+    const newSession = {
+      id: (db.chatSessions?.length || 0) + 1,
+      participant_id: Number(participantId),
+      title: 'Diskusi Medis #' + ((db.chatSessions?.filter(s => s.participant_id === Number(participantId))?.length || 0) + 1),
+      llm_model: 'qwen2.5-7b-instruct',
+      status: 'ACTIVE',
+      started_at: new Date().toISOString()
+    };
+    db.chatSessions = db.chatSessions || [];
+    db.chatSessions.push(newSession);
+
+    db.chatMessages = db.chatMessages || [];
+    db.chatMessages.push({
+      id: db.chatMessages.length + 1,
+      session_id: newSession.id,
+      role: 'ASSISTANT',
+      message: 'Halo! Saya Patriot AI. Sesi ini telah diinisiasi dan disupervisi langsung oleh Dokter Anda. Ada yang bisa kami bantu hari ini?',
+      created_at: new Date().toISOString()
+    });
+
+    saveDb(db);
+    const user = db.users?.find(u => u.id === Number(participantId));
+    return {
+      ...newSession,
+      participant_name: user ? user.name : 'Peserta',
+      participant_email: user ? user.email : 'peserta@example.com'
+    };
+  },
+
+  chatSupervisionDeleteSession: async (sessionId) => {
+    try {
+      const res = await fetch(`${API_URL}/chat/supervision/sessions/${sessionId}`, {
+        method: 'DELETE',
+        headers: getHeaders()
+      });
+      if (res.ok) return await res.json();
+    } catch (e) {}
+
+    const db = getDb();
+    db.chatSessions = db.chatSessions?.filter(s => s.id !== Number(sessionId)) || [];
+    db.chatMessages = db.chatMessages?.filter(m => m.session_id !== Number(sessionId)) || [];
+    saveDb(db);
+    return { success: true };
+  },
+
+  chatSupervisionSendMessage: async (sessionId, message) => {
+    try {
+      const res = await fetch(`${API_URL}/chat/supervision/sessions/${sessionId}/messages`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ message })
+      });
+      if (res.ok) return await res.json();
+    } catch (e) {}
+
+    const db = getDb();
+    db.chatMessages = db.chatMessages || [];
+    db.chatMessages.push({
+      id: db.chatMessages.length + 1,
+      session_id: Number(sessionId),
+      role: 'ASSISTANT',
+      message,
+      created_at: new Date().toISOString()
+    });
+    saveDb(db);
+    return db.chatMessages.filter(m => m.session_id === Number(sessionId));
+  },
+
+  chatSupervisionUpdateMessage: async (messageId, message) => {
+    try {
+      const res = await fetch(`${API_URL}/chat/supervision/messages/${messageId}`, {
+        method: 'PUT',
+        headers: getHeaders(),
+        body: JSON.stringify({ message })
+      });
+      if (res.ok) return await res.json();
+    } catch (e) {}
+
+    const db = getDb();
+    const msg = db.chatMessages?.find(m => m.id === Number(messageId));
+    if (msg) {
+      msg.message = message;
+      saveDb(db);
+    }
+    return msg || { id: messageId, message };
+  },
+
+  chatSupervisionDeleteMessage: async (messageId) => {
+    try {
+      const res = await fetch(`${API_URL}/chat/supervision/messages/${messageId}`, {
+        method: 'DELETE',
+        headers: getHeaders()
+      });
+      if (res.ok) return await res.json();
+    } catch (e) {}
+
+    const db = getDb();
+    db.chatMessages = db.chatMessages?.filter(m => m.id !== Number(messageId)) || [];
+    saveDb(db);
     return { success: true };
   }
 };

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import MewsScreening from './MewsScreening';
 import MewsHistory from './MewsHistory';
 import ChatbotWindow from '../components/ChatbotWindow';
@@ -17,16 +17,22 @@ export default function PesertaDashboard({ user, activeTab, setActiveTab }) {
   const [notifications, setNotifications] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const isFetchingNotifications = useRef(false);
+
   useEffect(() => {
     fetchNotifications();
   }, [activeTab]);
 
   const fetchNotifications = async () => {
+    if (isFetchingNotifications.current) return;
+    isFetchingNotifications.current = true;
     try {
       const data = await api.mewsGetNotifications();
       setNotifications(data);
     } catch (e) {
       console.error("Gagal memuat notifikasi", e);
+    } finally {
+      isFetchingNotifications.current = false;
     }
   };
 
