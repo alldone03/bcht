@@ -16,6 +16,11 @@ class MewsSeeder extends Seeder
 
     public function run(): void
     {
+        // Check if M-EWS template already exists
+        if (\Illuminate\Support\Facades\DB::table('mews_templates')->where('name', 'Modified Early Warning Score (M-EWS)')->exists()) {
+            return;
+        }
+
         // 1. Create Template
         $template = $this->service->createTemplate([
             'name' => 'Modified Early Warning Score (M-EWS)',
