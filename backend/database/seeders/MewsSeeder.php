@@ -16,8 +16,9 @@ class MewsSeeder extends Seeder
 
     public function run(): void
     {
-        // Check if M-EWS template already exists
-        if (\Illuminate\Support\Facades\DB::table('mews_templates')->where('name', 'Modified Early Warning Score (M-EWS)')->exists()) {
+        // Check if table exists and if M-EWS template already exists
+        if (!\Illuminate\Support\Facades\Schema::hasTable('mews_templates') || 
+            \Illuminate\Support\Facades\DB::table('mews_templates')->where('name', 'Modified Early Warning Score (M-EWS)')->exists()) {
             return;
         }
 

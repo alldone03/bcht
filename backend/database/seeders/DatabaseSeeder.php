@@ -11,7 +11,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         // 1. Seed Users
-        if (DB::table('users')->count() === 0) {
+        if (\Illuminate\Support\Facades\Schema::hasTable('users') && DB::table('users')->count() === 0) {
             DB::table('users')->insert([
                 [
                     'id' => 1,
