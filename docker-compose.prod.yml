@@ -3,7 +3,7 @@ version: '3.8'
 services:
   db:
     image: mysql:8.0
-    container_name: patriot_db_prod
+    container_name: patriot-db-prod
     restart: always
     environment:
       TZ: Asia/Jakarta
@@ -23,7 +23,7 @@ services:
 
   redis:
     image: redis:alpine
-    container_name: patriot_redis_prod
+    container_name: patriot-redis-prod
     restart: always
     environment:
       TZ: Asia/Jakarta
@@ -34,7 +34,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.prod
-    container_name: patriot_backend_prod
+    container_name: patriot-backend-prod
     restart: always
     env_file:
       - .env
@@ -57,7 +57,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.prod
-    container_name: patriot_queue_worker_prod
+    container_name: patriot-queue-worker-prod
     restart: always
     command: sh -c "until nc -z db 3306; do echo 'Waiting for database...'; sleep 1; done && php artisan queue:work"
     env_file:
@@ -84,7 +84,7 @@ services:
       args:
         - VITE_API_URL=https://project.insamo.id/patriot/api
         - VITE_WS_URL=wss://project.insamo.id/patriot/ws
-    container_name: patriot_frontend_prod
+    container_name: patriot-frontend-prod
     restart: always
     # ports:
     #   - "80:80"
@@ -98,7 +98,7 @@ services:
 
   websocket:
     image: node:18-alpine
-    container_name: patriot_websocket_prod
+    container_name: patriot-websocket-prod
     restart: always
     volumes:
       - ./backend:/app
