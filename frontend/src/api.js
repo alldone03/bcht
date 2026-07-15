@@ -6,7 +6,7 @@ const fetch = async (...args) => {
   if (res.status === 401) {
     localStorage.removeItem('pt_token');
     localStorage.removeItem('pt_user');
-    window.location.href = '/';
+    window.location.href = import.meta.env.BASE_URL || '/';
   }
   return res;
 };

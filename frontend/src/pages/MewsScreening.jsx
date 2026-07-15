@@ -400,7 +400,7 @@ export default function MewsScreening({ user }) {
             </button>
 
             <button
-              onClick={() => { window.location.href = '/chatbot'; }}
+              onClick={() => { window.location.href = (import.meta.env.BASE_URL || '/') + 'chatbot'; }}
               className="btn btn-primary btn-sm rounded-xl px-5 font-bold shadow-lg shadow-primary/10 flex items-center gap-1.5"
             >
               Diskusi dengan Patriot AI <ArrowRight className="w-4 h-4" />
