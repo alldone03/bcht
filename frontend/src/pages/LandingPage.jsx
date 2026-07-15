@@ -1,6 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Stethoscope, ShieldCheck, HeartHandshake, ArrowRight, BrainCircuit, Sparkles, MessageCircleHeart } from 'lucide-react';
+import patriotLogo from '../assets/Patriot Logo.png';
 
 export default function LandingPage() {
   const navigate = useNavigate();
@@ -54,7 +55,7 @@ export default function LandingPage() {
                 <div className="absolute -bottom-8 right-4 w-72 h-72 bg-secondary/20 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
 
                 <img 
-                  src="/Patriot Logo.png" 
+                  src={patriotLogo} 
                   alt="Patriot Logo" 
                   className="relative w-full max-w-[380px] object-contain drop-shadow-2xl transition-transform duration-500 hover:scale-105" 
                 />

@@ -1,7 +1,7 @@
-const http = require('http');
-const crypto = require('crypto');
-const fs = require('fs');
-const path = require('path');
+import http from 'http';
+import crypto from 'crypto';
+import fs from 'fs';
+import path from 'path';
 
 // Helper to parse .env file
 function loadEnv() {

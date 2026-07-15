@@ -45,6 +45,7 @@ services:
       OPENAI_BASE_URL: ${OPENAI_BASE_URL}
       OPENAI_MODEL: ${OPENAI_MODEL}
       WEBSOCKET_BROADCAST_URL: http://websocket:6001/broadcast
+      APP_URL: https://project.insamo.id/patriot
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
@@ -92,8 +93,8 @@ services:
     #   - "80:80"
     environment:
       TZ: Asia/Jakarta
-      VITE_API_URL: https://patriot.insamo.id/api
-      VITE_WS_URL: wss://patriot.insamo.id/ws
+      VITE_API_URL: https://project.insamo.id/patriot/api
+      VITE_WS_URL: wss://project.insamo.id/patriot/ws
     depends_on:
       - backend
     networks:
