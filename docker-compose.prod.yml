@@ -36,21 +36,13 @@ services:
       dockerfile: Dockerfile.prod
     container_name: patriot_backend_prod
     restart: always
+    env_file:
+      - .env
     environment:
       TZ: Asia/Jakarta
-      DB_CONNECTION: ${DB_CONNECTION}
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
-      DB_DATABASE: ${DB_DATABASE}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
       REDIS_HOST: redis
       QUEUE_CONNECTION: redis
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
-      OPENAI_BASE_URL: ${OPENAI_BASE_URL}
-      OPENAI_MODEL: ${OPENAI_MODEL}
       WEBSOCKET_BROADCAST_URL: http://websocket:6001/broadcast
-      APP_URL: https://project.insamo.id/patriot
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
@@ -68,19 +60,12 @@ services:
     container_name: patriot_queue_worker_prod
     restart: always
     command: sh -c "until nc -z db 3306; do echo 'Waiting for database...'; sleep 1; done && php artisan queue:work"
+    env_file:
+      - .env
     environment:
       TZ: Asia/Jakarta
-      DB_CONNECTION: ${DB_CONNECTION}
-      DB_HOST: ${DB_HOST}
-      DB_PORT: ${DB_PORT}
-      DB_DATABASE: ${DB_DATABASE}
-      DB_USERNAME: ${DB_USERNAME}
-      DB_PASSWORD: ${DB_PASSWORD}
       REDIS_HOST: redis
       QUEUE_CONNECTION: redis
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
-      OPENAI_BASE_URL: ${OPENAI_BASE_URL}
-      OPENAI_MODEL: ${OPENAI_MODEL}
       WEBSOCKET_BROADCAST_URL: http://websocket:6001/broadcast
     extra_hosts:
       - "host.docker.internal:host-gateway"

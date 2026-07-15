@@ -4,9 +4,8 @@ Ikuti langkah-langkah di bawah ini untuk mendeploy aplikasi menggunakan Docker C
 
 1. Salin file environment:
    cp .env.example .env
-   cp backend/.env.example backend/.env
 
-   *Sesuaikan konfigurasi DB, Redis, dan kunci API OpenAI di file .env.*
+   *Sesuaikan konfigurasi DB, Redis, APP_KEY, dan kunci API OpenAI di file .env.*
 
 2. Bangun dan jalankan kontainer Docker dalam mode daemon (latar belakang):
    docker compose -f docker-compose.prod.yml up -d --build
