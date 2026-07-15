@@ -24,8 +24,7 @@ COPY . .
 RUN composer install --no-interaction --optimize-autoloader --no-dev
 
 # Optimize configurations
-RUN php artisan config:cache && \
-    php artisan route:cache && \
+RUN php artisan route:cache && \
     php artisan view:cache
 
 EXPOSE 8000
