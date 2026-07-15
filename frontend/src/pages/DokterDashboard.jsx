@@ -28,7 +28,9 @@ export default function DokterDashboard({ user, activeTab, setActiveTab }) {
   const isFetchingMews = useRef(false);
 
   useEffect(() => {
-    fetchMewsSubmissions();
+    if (activeTab === 'mews-submissions') {
+      fetchMewsSubmissions();
+    }
   }, [activeTab]);
 
   const fetchMewsSubmissions = async () => {
