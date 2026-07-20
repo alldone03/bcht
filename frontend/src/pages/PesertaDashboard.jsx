@@ -2,6 +2,8 @@ import React, { useState, useEffect, useRef } from 'react';
 import MewsScreening from './MewsScreening';
 import MewsHistory from './MewsHistory';
 import ChatbotWindow from '../components/ChatbotWindow';
+import FormsList from './FormsList';
+import FormResponsesList from './FormResponsesList';
 import { api } from '../api';
 import { 
   Bell, 
@@ -87,6 +89,10 @@ export default function PesertaDashboard({ user, activeTab, setActiveTab }) {
         <div className="card bg-base-100 shadow-xl border border-base-200 rounded-3xl overflow-hidden p-4">
           <ChatbotWindow user={user} />
         </div>
+      ) : activeTab === 'forms-list' ? (
+        <FormsList user={user} setActiveTab={setActiveTab} />
+      ) : activeTab === 'forms-responses' ? (
+        <FormResponsesList />
       ) : (
         <MewsScreening user={user} onSubmitted={fetchNotifications} />
       )}

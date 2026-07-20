@@ -1,5 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import MewsBuilder from './MewsBuilder';
+import FormBuilder from './FormBuilder';
+import FormResponsesList from './FormResponsesList';
 import { api } from '../api';
 import { 
   ClipboardList, 
@@ -107,6 +109,10 @@ export default function DokterDashboard({ user, activeTab, setActiveTab }) {
         <div>
           <MewsBuilder doctorId={user.id} onTemplateSaved={() => setActiveTab('mews-submissions')} />
         </div>
+      ) : activeTab === 'forms-builder' ? (
+        <FormBuilder onBack={() => setActiveTab('mews-submissions')} />
+      ) : activeTab === 'forms-responses' ? (
+        <FormResponsesList />
       ) : activeTab === 'mews-chats' ? (
         <ChatSupervisionView />
       ) : (

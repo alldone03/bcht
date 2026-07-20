@@ -1,0 +1,36 @@
+# CHECKLIST PEKERJAAN: DYNAMIC FORM BUILDER & IMPROVEMENT
+
+## FASE 1: ANALISIS & DESAIN DATABASE
+- [x] Analisis kebutuhan entitas Users, Roles, Teams, Forms, Questions, dan Responses.
+- [x] Perancangan skema relasi database yang mendukung RBAC ketat.
+- [x] Pembuatan dokumen Rencana Implementasi (implementation_plan.md).
+
+## FASE 2: IMPLEMENTASI DATABASE & SEEDING (BACKEND)
+- [x] Membuat file migration baru untuk tabel: roles, permissions, teams, forms, questions, submissions, answers, serta memperbarui tabel users.
+- [x] Membuat models Eloquent Laravel untuk semua entitas baru:
+  - [x] Role.php
+  - [x] Permission.php
+  - [x] Team.php
+  - [x] Form.php
+  - [x] Question.php
+  - [x] FormSubmission.php
+  - [x] Answer.php
+- [x] Mengupdate model User.php dengan relasi role dan team.
+- [x] Membuat DatabaseSeeder & MewsSeeder baru untuk menginisialisasi Peran, Otorisasi, Tim sampel, dan Form 1 s/d Form 6 default.
+
+## FASE 3: BACKEND API & CONTROLLER (BACKEND CRUD)
+- [x] Membuat controller FormBuilderController.php (CRUD Form dan Questions).
+- [x] Membuat controller FormResponseController.php (Submit jawaban peserta, review, dan penulisan diagnosa oleh Dokter).
+- [x] Menambahkan rute API baru di routes/api.php dengan middleware auth:sanctum & pengecekan RBAC.
+- [x] Membuat Middleware khusus untuk pengecekan Permission/Role (RBAC ketat).
+
+## FASE 4: DYNAMIC FORM BUILDER & FILLER (FRONTEND)
+- [x] Membuat halaman FormBuilder.jsx (Antarmuka dokter untuk membuat & mengedit Form 1-6 beserta input dinamis, logika bersyarat, frekuensi, dan target audiens).
+- [x] Membuat halaman FormFiller.jsx (Secara dinamis merender pertanyaan berdasarkan tipe input dan menjalankan logika kondisional bersyarat langsung di browser).
+- [x] Membuat halaman FormResponsesList.jsx (Daftar respon form peserta untuk dokter, serta input teks diagnosa medis).
+- [x] Menambahkan rute menu baru dan memperbarui navigasi di App.jsx berdasarkan hak akses peran pengguna (RBAC).
+
+## FASE 5: VERIFIKASI & FINISHING
+- [x] Melakukan pengujian integrasi API backend (menggunakan PHPUnit / Postman / unit test).
+- [x] Melakukan verifikasi alur di frontend (Membuat form -> Mengisi form oleh peserta -> Mendiagnosa form oleh dokter).
+- [x] Membuat dokumentasi penyelesaian pekerjaan (walkthrough.md).

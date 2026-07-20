@@ -1,0 +1,464 @@
+saya sebelumnya sudah ada appnya saya mau improve app saya menggunakan antigravity-ide, berikan saran prompt
+
+Bagian	Kapan	Diisi oleh
+Profil Awal	Satu kali, 4–6 minggu sebelum berangkat	Peserta + tim kesehatan
+Pra-Keberangkatan	24–72 jam sebelum berangkat	Peserta
+Check-in Harian	Sebelum tugas; ulangi kapan pun bila kondisi berubah	Peserta + teman pendamping
+Keluhan/Kejadian	Hanya muncul bila ada gejala atau paparan	Peserta + tim kesehatan
+Kesehatan Jiwa	DASS-21 setiap dua minggu; keselamatan dapat dicek kapan pun	Peserta; hasil ditinjau petugas
+Audit Posko	Setiap minggu dan setelah perubahan lokasi	Penanggung jawab tim
+
+
+pada bagian itu adalah jenis form yang dikeluarkan oleh dokter dan diedit oleh dokter, hasil jawaban dari form tersebut bisa dilihat oleh dokter, kemudian untuk kapan dan untuk siapa dikeluarkan oleh dokter,
+
+role ada dokter, admin, peserta, tim Kesehatan, penanggung jawab tim, petugas Kesehatan, teman pendamping.
+teman pendamping berdasarkan teman yang masuk terhadap 1 tim, jadi ada 
+Nama/ID peserta: __________________________________________
+Tim/lokasi: _______________________________________________
+
+formnya seperti ini
+Form 1 — Profil Awal
+Diisi satu kali, idealnya 4–6 minggu sebelum keberangkatan. Jawaban medis hanya dilihat oleh petugas yang berwenang.
+ID	Pertanyaan	Pilihan/Isian	Bila Terpicu
+A01	Nama lengkap atau ID peserta	____________________________	—
+A02	Tanggal lahir dan usia	____ / ____ / ______; usia ____ tahun	—
+A03	Lokasi penugasan	Provinsi; kabupaten/kota; kecamatan/desa; titik/koordinat bila tersedia	—
+A04	Tanggal mulai dan selesai penugasan	Mulai ____ / ____ / ______; selesai ____ / ____ / ______	—
+A05	Aktivitas lapangan yang akan dilakukan (boleh lebih dari satu)	
+☐ Berjalan jauh/trekking
+☐ Mengemudi
+☐ Naik perahu/aktivitas air
+☐ Kerja di panas
+☐ Kerja malam
+☐ Daerah pegunungan
+☐ Hutan/kebun
+☐ Gua/tambang
+☐ Kontak hewan
+☐ Kontak masyarakat/pelayanan
+☐ Lainnya: ____	—
+A06	Apakah Anda memiliki kondisi kesehatan yang dapat kambuh atau memengaruhi kegiatan lapangan?	
+☐ Tidak ada
+☐ Asma/penyakit paru
+☐ Penyakit jantung/tekanan darah
+☐ Diabetes/gula darah
+☐ Penyakit ginjal/hati
+☐ Kejang/migrain/penyakit saraf
+☐ Gangguan pembekuan darah
+☐ Daya tahan tubuh lemah
+☐ Kondisi lainnya: ____	Buat rencana perawatan pribadi sebelum berangkat
+A07	Apakah Anda pernah mengalami kondisi berikut saat aktivitas atau perjalanan?	
+☐ Tidak pernah
+☐ Pingsan saat aktivitas
+☐ Penyakit akibat panas
+☐ Serangan asma berat
+☐ Kejang
+☐ Gula darah terlalu rendah
+☐ Reaksi obat berat
+☐ Lainnya: ____	Tinjau bersama petugas kesehatan sebelum berangkat
+A08	Apakah Anda mempunyai alergi berat atau pernah mengalami anafilaksis?	
+☐ Tidak
+☐ Ya
+☐ Tidak yakin	Catat pemicu, tanda awal, dan obat yang diresepkan
+A09	Bila menjawab 'Ya', apa pemicu alerginya dan obat darurat apa yang diresepkan?	Pemicu: ____; obat/rencana: ____	Simpan rencana bersama peserta dan teman pendamping
+A10	Apakah Anda menggunakan obat rutin, obat pencegahan yang diresepkan, atau alat kesehatan?	
+☐ Tidak
+☐ Ya	Isi daftar obat/alat
+A11	Daftar obat/alat kesehatan	
+☐ Nama
+☐ dosis
+☐ waktu penggunaan
+☐ persediaan sampai tanggal
+☐ kebutuhan khusus	Pastikan persediaan dan cadangan cukup
+A12	Apakah obat atau alat kesehatan memerlukan pendinginan, listrik, pemantauan, atau penyimpanan khusus?	
+☐ Tidak
+☐ Pendinginan
+☐ Listrik/baterai
+☐ Pemantauan berkala
+☐ Penyimpanan aman
+☐ Lainnya: ____	Siapkan rencana cadangan bila listrik/alat gagal
+A13	Apakah ada kebutuhan yang perlu disiapkan agar Anda dapat bertugas dengan aman?	
+☐ Tidak ada
+☐ Mobilitas
+☐ Penglihatan
+☐ Pendengaran
+☐ Komunikasi
+☐ Diet/alergi makanan
+☐ Neurodiversitas
+☐ Menstruasi/reproduksi
+☐ Kebutuhan lainnya: ____
+☐ Memilih membahas secara privat	Hubungi petugas terkait untuk akomodasi
+A14	Apakah ada kemungkinan hamil atau kebutuhan kesehatan reproduksi yang perlu dibahas secara privat?	
+☐ Tidak
+☐ Ya
+☐ Tidak yakin
+☐ Memilih tidak menjawab	Hubungi tim kesehatan secara privat
+A15	Apakah ada pengobatan kesehatan jiwa, obat, konseling, atau rencana keselamatan yang perlu tetap berjalan selama penugasan?	
+☐ Tidak
+☐ Ya
+☐ Memilih membahas secara privat	Susun keberlanjutan perawatan sebelum berangkat
+A16	Apakah status imunisasi rutin dan tetanus sudah ditinjau untuk lokasi penugasan?	
+☐ Sudah
+☐ Belum
+☐ Tidak yakin	Tinjau dengan petugas kesehatan sebelum berangkat
+A17	Bila vaksin atau obat pencegahan yang diresepkan tertentu direkomendasikan untuk lokasi Anda, apakah sudah dikonsultasikan dengan dokter?	
+☐ Sudah
+☐ Belum
+☐ Tidak diperlukan
+☐ Tidak yakin	Konsultasi; aplikasi tidak meresepkan obat
+A18	Apakah BPJS/asuransi kesehatan aktif dan rencana biaya evakuasi telah dipastikan?	
+☐ Ya
+☐ Tidak
+☐ Tidak yakin	Selesaikan sebelum penempatan terpencil
+A19	Kontak darurat	Nama: ____; hubungan: ____; telepon: ____	—
+A20	Kontak aman selain pimpinan langsung	Nama: ____; hubungan: ____; telepon: ____	—
+ 
+
+Form 2 — Konfirmasi Pra-Keberangkatan
+Diisi 24–72 jam sebelum keberangkatan.
+ID	Pertanyaan	Pilihan/Isian	Bila Terpicu
+B01	Dalam 72 jam terakhir, apakah muncul keluhan baru?	
+☐ Tidak ada
+☐ Demam/meriang
+☐ Batuk/sakit tenggorokan
+☐ Sesak
+☐ Diare
+☐ Muntah
+☐ Nyeri perut
+☐ Ruam
+☐ Cedera
+☐ Keluhan lain: ____	Buka modul keluhan dan minta penilaian sebelum berangkat
+B02	Apakah seluruh obat rutin, alat kesehatan, dan persediaan cadangan sudah dibawa?	
+☐ Ya
+☐ Tidak
+☐ Tidak berlaku	Lengkapi sebelum berangkat
+B03	Bila Anda diberi resep obat pencegahan yang diresepkan, apakah sudah dimulai dan persediaannya cukup sesuai petunjuk dokter?	
+☐ Ya
+☐ Tidak
+☐ Tidak berlaku
+☐ Tidak yakin	Hubungi dokter/petugas kesehatan; jangan mengubah obat sendiri
+B04	Apakah nama dan nomor teman pendamping, fasilitas rujukan, rute evakuasi, serta kontak bantuan sudah tersimpan secara offline?	
+☐ Ya
+☐ Sebagian
+☐ Belum	Lengkapi sebelum masuk lapangan
+B05	Apakah Anda merasa mampu melakukan perjalanan dan tugas awal dengan aman?	
+☐ Ya
+☐ Ya, dengan pembatasan
+☐ Tidak
+☐ Tidak yakin	Tinjau bersama petugas kesehatan/koordinator sebelum berangkat
+B06	Apakah Anda ingin berbicara secara privat dengan petugas kesehatan atau petugas perlindungan peserta sebelum berangkat?	
+☐ Tidak
+☐ Ya, hari ini
+☐ Ya, sekarang	Hubungi sesuai pilihan
+ 
+
+Form 3 — Check-in Harian
+Diisi sebelum tugas dan diulang bila kondisi berubah. Bagian emosi, rasa aman, dan keselamatan diri hanya dilihat petugas kesehatan/perlindungan peserta yang berwenang—bukan pimpinan langsung atau teman satu tim.
+TANDA BAHAYA: sulit bernapas/tidak dapat bicara, nyeri dada berat, sulit dibangunkan/tidak merespons, kejang, perdarahan hebat, wajah mencong/lengan lemah sebelah/bicara pelo, atau bengkak wajah/lidah disertai sulit bernapas. HENTIKAN KEGIATAN • JANGAN SENDIRIAN • PANGGIL PETUGAS • AKTIFKAN EVAKUASI
+No.	Pertanyaan	Pilihan jawaban
+1	Apakah Anda atau teman di dekat Anda sedang mengalami tanda bahaya sekarang?	
+☐ Tidak
+☐ Ya
+☐ Tidak yakin
+2	Bagaimana kemampuan Anda menjalankan tugas hari ini dengan aman?	
+☐ Seperti biasa
+☐ Hanya mampu tugas ringan
+☐ Tidak mampu bertugas
+☐ Belum yakin—ingin dinilai petugas
+3	Sejak check-in terakhir, apakah ada keluhan baru atau keluhan yang memburuk?	
+☐ Tidak
+☐ Ya
+4	Sejak check-in terakhir, apakah ada cedera, gigitan/cakaran/sengatan, kontak banjir/lumpur, tertusuk benda tajam, atau terkena darah/cairan tubuh?	
+☐ Tidak
+☐ Ya
+☐ Ada kejadian lain yang ingin saya bahas secara pribadi
+5	Jika Anda menggunakan obat: adakah masalah dengan obat rutin atau obat pencegahan yang diresepkan?	
+☐ Tidak ada masalah
+☐ Lupa atau terlewat
+☐ Hampir habis atau hilang
+☐ Muntah setelah minum obat
+☐ Ada efek yang mengganggu
+☐ Saya tidak menggunakan obat
+6	Total kira-kira berapa lama Anda tidur dalam 24 jam terakhir, termasuk tidur siang?	
+☐ Kurang dari 4 jam
+☐ 4–5 jam
+☐ 6–7 jam
+☐ 8 jam atau lebih
+7	Apakah Anda sangat mengantuk, tertidur sesaat tanpa sengaja, hampir celaka, atau merasa tidak aman mengemudi/menjalankan tugas berisiko?	
+☐ Tidak
+☐ Ya
+☐ Tidak yakin
+8	Seberapa berat tekanan emosional Anda sejak check-in terakhir (misalnya sedih, cemas, tegang, atau mudah marah)?	
+☐ Tidak ada
+☐ Ringan dan masih dapat saya atasi
+☐ Cukup mengganggu
+☐ Berat atau sulit saya atasi
+9	Apakah saat ini Anda merasa aman selama menjalani kegiatan dan tinggal di lokasi ini?	
+☐ Ya
+☐ Tidak sepenuhnya
+☐ Tidak
+☐ Saya lebih nyaman membicarakannya langsung
+10	Sejak check-in terakhir, apakah muncul pikiran untuk menyakiti diri sendiri atau bunuh diri?	
+☐ Tidak
+☐ Ya, tetapi tidak sekarang
+☐ Ya, sekarang
+☐ Saya ingin membicarakannya langsung
+11	Apakah Anda ingin dihubungi secara pribadi oleh petugas kesehatan atau petugas perlindungan peserta?	
+☐ Tidak sekarang
+☐ Ya, hari ini
+☐ Ya, secepat mungkin
+☐ Saya akan menghubungi sendiri
+
+
+Pertanyaan Lanjutan — isi hanya bila terpicu
+No.	Pertanyaan	Pilihan jawaban
+3A	Jika menjawab Ya pada nomor 3, keluhan apa yang Anda rasakan?	
+☐ Demam, meriang, atau menggigil
+☐ Batuk, sakit tenggorokan, atau sesak
+☐ Diare, muntah, atau nyeri perut
+☐ Sakit kepala baru atau berat
+☐ Sangat haus, pusing, kram, atau lemas
+☐ Ruam
+☐ Perdarahan tidak biasa
+☐ Luka memburuk, merah, bengkak, atau bernanah
+☐ Nyeri yang mengganggu aktivitas
+☐ Keluhan lain
+10A	Jika jawaban nomor 10 bukan Tidak: apakah Anda merasa mungkin melakukan sesuatu untuk menyakiti diri dalam waktu dekat?	
+☐ Tidak
+☐ Tidak yakin
+☐ Ya
+☐ Saya ingin berbicara langsung
+
+
+
+Laporan Opsional tentang Teman
+Bagian ini terpisah dari catatan kesehatan Anda dan tidak masuk ke hasil pemeriksaan diri Anda.
+No.	Pertanyaan	Pilihan jawaban
+B1	Apakah Anda khawatir seorang teman sedang dalam bahaya atau tidak mampu bekerja dengan aman?	
+☐ Tidak
+☐ Ya
+☐ Tidak yakin
+B1A	Tanda apa yang terlihat?	
+☐ Sulit dibangunkan
+☐ Bingung
+☐ Sesak
+☐ Sempoyongan
+☐ Pingsan
+☐ Sangat mengantuk
+☐ Tidak mampu bekerja aman
+☐ Lainnya
+TINDAKAN: Jawaban Ya/Tidak yakin pada tanda bahaya atau risiko menyakiti diri sekarang = jangan sendirian dan minta bantuan segera. Kantuk berat = hentikan mengemudi/tugas berisiko. Keluhan/kejadian baru = lanjutkan Form 4. Permintaan pribadi = gunakan kanal petugas kesehatan/perlindungan peserta.
+ 
+
+
+Form 4 — Keluhan atau Kejadian Khusus
+Isi hanya bagian yang sesuai dengan gejala atau kejadian yang Anda alami.
+ID	Pertanyaan	Pilihan/Isian	Bila Terpicu
+K01	Demam: berapa suhu tertinggi yang terukur?	
+☐ ____ °C
+☐ Tidak sempat mengukur tetapi merasa demam	Catat waktu mulai dan lokasi 30 hari terakhir
+K02	Demam: kapan mulai dan di lokasi mana saja Anda berada dalam 30 hari terakhir?	Mulai: ____; lokasi: ____	Hubungi petugas kesehatan hari ini
+K03	Demam: apakah ada nyeri perut berat, muntah berulang, perdarahan, sangat lemas/mengantuk/gelisah, sesak, atau kencing sangat sedikit?	
+☐ Tidak ada
+☐ Nyeri perut berat
+☐ Muntah berulang
+☐ Perdarahan
+☐ Sangat lemas/mengantuk/gelisah
+☐ Sesak
+☐ Kencing sangat sedikit	DARURAT/PERIKSA SEGERA
+K04	Diare/muntah: berapa kali BAB cair dan muntah dalam 24 jam terakhir?	BAB cair ____ kali; muntah ____ kali	Nilai kemampuan minum dan tanda bahaya
+K05	Diare/muntah: apakah ada darah atau warna hitam pada BAB, demam, nyeri perut berat, muntah terus, atau tidak mampu minum?	
+☐ Tidak ada
+☐ BAB berdarah
+☐ BAB hitam
+☐ Demam
+☐ Nyeri berat
+☐ Muntah terus
+☐ Tidak mampu minum	PERIKSA SEGERA; jangan memakai obat antidiare sebagai satu-satunya penanganan bila BAB berdarah/demam
+K06	Panas/dehidrasi: apakah keluhan muncul saat/setelah bekerja di panas atau aktivitas berat?	
+☐ Tidak
+☐ Ya
+☐ Tidak yakin	Pindah ke tempat sejuk, hentikan aktivitas, dan lanjutkan penilaian
+K07	Panas/dehidrasi: apakah ada bingung, kejang, pingsan/kolaps, atau berjalan sempoyongan?	
+☐ Tidak ada
+☐ Bingung
+☐ Kejang
+☐ Pingsan/kolaps
+☐ Sempoyongan	DARURAT: dinginkan segera sambil mengaktifkan evakuasi
+K08	Cedera kepala: apakah setelah benturan ada pingsan, muntah berulang, lupa kejadian, bingung, sakit kepala memburuk, kejang, lemah/baal, atau cairan/darah dari hidung/telinga?	
+☐ Tidak ada
+☐ Pingsan
+☐ Muntah berulang
+☐ Lupa kejadian
+☐ Bingung
+☐ Sakit kepala memburuk
+☐ Kejang
+☐ Lemah/baal
+☐ Cairan/darah dari hidung/telinga	DARURAT/PERIKSA SEGERA
+K09	Gigitan/cakaran hewan: hewan apa, kapan, di mana, dan apakah kulit terluka atau air liur mengenai luka/mata/mulut?	Hewan: ____; waktu: ____; lokasi: ____; jenis paparan: ____	Cuci dengan sabun dan air mengalir sedikitnya 15 menit; segera cari penilaian vaksin/serum rabies
+K10	Gigitan ular: kapan terjadi, di bagian tubuh mana, dan gejala apa yang muncul?	Waktu: ____; bagian tubuh: ____; bengkak/nyeri/perdarahan/lemah/sesak: ____	DARURAT: diamkan korban dan anggota tubuh, lepas benda ketat, evakuasi cepat; jangan sayat/isap/ikat ketat
+K11	Paparan darah/cairan tubuh: apakah melalui tusukan, kulit luka, mata, mulut, atau kontak seksual? Kapan terjadi?	Cara paparan: ____; waktu: ____; cairan: ____	PERIKSA SEGERA; PEP HIV paling baik dimulai secepat mungkin dan tidak lebih dari 72 jam
+K12	Apakah terjadi kontak seksual tanpa persetujuan atau Anda merasa dalam bahaya seksual sekarang?	
+☐ Tidak
+☐ Ya
+☐ Tidak yakin
+☐ Memilih bicara langsung	Utamakan keselamatan, kanal privat, pemeriksaan medis segera, dan dukungan berpusat pada penyintas
+K13	Bila ada kemungkinan hamil: apakah terjadi perdarahan, nyeri perut/panggul berat, pingsan, kejang, sakit kepala berat/pandangan berubah, atau muntah berat?	
+☐ Tidak ada
+☐ Perdarahan
+☐ Nyeri berat
+☐ Pingsan
+☐ Kejang
+☐ Sakit kepala berat
+☐ Pandangan berubah
+☐ Muntah berat	DARURAT/PERIKSA SEGERA
+K14	Setelah naik ke ketinggian: apakah ada sakit kepala, mual, pusing, sangat lelah, bingung/sempoyongan, atau sesak saat istirahat?	
+☐ Tidak ada
+☐ Sakit kepala
+☐ Mual
+☐ Pusing
+☐ Sangat lelah
+☐ Bingung/sempoyongan
+☐ Sesak saat istirahat	DARURAT: jangan naik lebih tinggi; turun/evakuasi
+K15	Apakah beberapa orang di ruang yang sama sakit kepala, pusing, mual, lemah, atau bingung di dekat genset, arang, kompor, atau pembakaran?	
+☐ Tidak
+☐ Ya
+☐ Tidak yakin	DARURAT: pindah ke udara terbuka tanpa membahayakan penolong dan aktifkan bantuan
+K16	Apakah dua orang atau lebih mengalami keluhan serupa pada waktu dan lokasi yang berdekatan?	
+☐ Tidak
+☐ Ya
+☐ Tidak yakin	Laporkan kepada penanggung jawab kesehatan tim untuk pemeriksaan klaster
+ 
+
+
+Form 5 — Kesehatan Jiwa Setiap Dua Minggu
+PRIVAT • Jawaban ditinjau oleh petugas kesehatan jiwa • Bukan diagnosis
+5A. DASS-21 Bahasa Indonesia
+Petunjuk: Kuesioner ini terdiri dari berbagai pernyataan yang mungkin sesuai dengan pengalaman Bapak/Ibu/Saudara dalam menghadapi situasi hidup sehari-hari. Selanjutnya, Bapak/Ibu/Saudara diminta untuk menjawab dengan cara memberi tanda silang (X) pada salah satu kolom yang paling sesuai dengan pengalaman Bapak/Ibu/Saudara selama satu minggu belakangan ini. Tidak ada jawaban yang benar ataupun salah, karena itu isilah sesuai dengan keadaan diri Bapak/Ibu/Saudara yang sesungguhnya, yaitu berdasarkan jawaban pertama yang terlintas dalam pikiran Bapak/Ibu/Saudara.
+0
+Tidak sesuai dengan saya sama sekali, atau tidak pernah.	1
+Sesuai dengan saya sampai tingkat tertentu, atau kadang kadang.	2
+Sesuai dengan saya sampai batas yang dapat dipertimbangkan, atau lumayan sering.	3
+Sangat sesuai dengan saya, atau sering sekali.
+No.	Pernyataan	0	1	2	3
+1	Saya merasa sulit untuk beristirahat.	☐	☐	☐	☐
+2	Saya merasa bibir saya sering kering.	☐	☐	☐	☐
+3	Saya sama sekali tidak dapat merasakan perasaan positif.	☐	☐	☐	☐
+4	Saya mengalami kesulitan bernafas (misalnya: seringkali terengah-engah atau tidak dapat bernafas padahal tidak melakukan aktivitas fisik sebelumnya).	☐	☐	☐	☐
+5	Saya merasa sulit untuk meningkatkan inisiatif dalam melakukan sesuatu.	☐	☐	☐	☐
+6	Saya cenderung bereaksi berlebihan terhadap suatu situasi.	☐	☐	☐	☐
+7	Saya merasa gemetar (misalnya: pada tangan).	☐	☐	☐	☐
+8	Saya merasa telah menghabiskan banyak energi untuk merasa cemas.	☐	☐	☐	☐
+9	Saya merasa khawatir dengan situasi dimana saya mungkin menjadi panik dan mempermalukan diri sendiri.	☐	☐	☐	☐
+10	Saya merasa tidak ada hal yang dapat diharapkan di masa depan.	☐	☐	☐	☐
+11	Saya menemukan diri saya mudah gelisah.	☐	☐	☐	☐
+12	Saya merasa sulit untuk bersantai.	☐	☐	☐	☐
+13	Saya merasa putus asa dan sedih.	☐	☐	☐	☐
+14	Saya tidak dapat memaklumi hal apapun yang menghalangi saya untuk menyelesaikan hal yang sedang saya lakukan.	☐	☐	☐	☐
+15	Saya merasa saya hampir panik.	☐	☐	☐	☐
+16	Saya tidak merasa antusias dalam hal apapun.	☐	☐	☐	☐
+17	Saya merasa bahwa saya tidak berharga.	☐	☐	☐	☐
+18	Saya merasa bahwa saya mudah tersinggung.	☐	☐	☐	☐
+19	Saya menyadari kegiatan jantung, walaupun saya tidak sehabis melakukan aktivitas fisik (misalnya: merasa detak jantung meningkat atau melemah).	☐	☐	☐	☐
+20	Saya merasa takut tanpa alasan yang jelas.	☐	☐	☐	☐
+21	Saya merasa bahwa hidup tidak berarti.	☐	☐	☐	☐
+
+
+
+5B. Keselamatan dan Dukungan
+No.	Pertanyaan	Pilihan jawaban
+1	Dalam dua minggu terakhir, apakah tidur atau kelelahan berulang membuat Anda tidak aman atau tidak mampu berfungsi?	
+☐ Tidak
+☐ Sedikit
+☐ Cukup mengganggu
+☐ Sangat mengganggu
+2	Apakah alkohol, obat penenang/stimulan, atau zat lain memengaruhi keselamatan, keputusan, tidur, atau hubungan Anda?	
+☐ Tidak
+☐ Ya
+☐ Tidak yakin
+☐ Saya lebih nyaman membahasnya langsung
+3	Sejak pengisian terakhir, apakah Anda mengalami kejadian yang sangat menakutkan atau mengancam keselamatan?	
+☐ Tidak
+☐ Ya
+☐ Saya lebih nyaman membahasnya langsung
+4	Apakah Anda merasa sangat terisolasi, kesepian, atau tidak memiliki orang yang aman untuk dimintai bantuan?	
+☐ Tidak
+☐ Kadang-kadang
+☐ Sering
+☐ Saya lebih nyaman membahasnya langsung
+5	Sejak pengisian terakhir, apakah muncul pikiran untuk menyakiti diri sendiri atau bunuh diri?	
+☐ Tidak
+☐ Ya, tetapi tidak sekarang
+☐ Ya, sekarang
+☐ Saya ingin membicarakannya langsung
+5A	Jika jawaban nomor 5 bukan Tidak: apakah Anda merasa mungkin melakukan sesuatu untuk menyakiti diri dalam waktu dekat?	
+☐ Tidak
+☐ Tidak yakin
+☐ Ya
+☐ Saya ingin berbicara langsung
+6	Apakah Anda ingin dihubungi secara pribadi?	
+☐ Tidak sekarang
+☐ Ya, hari ini
+☐ Ya, secepat mungkin
+☐ Saya akan menghubungi sendiri
+Jika ada bahaya sekarang: jangan sendirian, hubungi petugas lapangan/tenaga kesehatan, fasilitas gawat darurat setempat, atau PSC 119. Untuk dukungan krisis psikologis, akses healing119.id atau telepon 119 ekstensi 8.
+ 
+
+Form 6 — Audit Mingguan Tim/Posko
+Diisi oleh penanggung jawab tim setiap minggu dan setiap kali berpindah lokasi.
+ID	Pertanyaan	Pilihan/Isian	Bila Terpicu
+P01	Air minum: sumber, pengolahan, dan wadah penyimpanan sudah aman	
+☐ Ya
+☐ Belum
+☐ Tidak tahu	Perbaiki sebelum dipakai
+P02	Sabun, tempat cuci tangan, jamban, serta pengelolaan sampah/limbah tersedia dan berfungsi	
+☐ Ya
+☐ Belum
+☐ Tidak tahu	Tunjuk penanggung jawab dan perbaiki
+P03	Makanan disimpan/dimasak dengan aman dan anggota yang sedang diare/muntah tidak menyiapkan makanan	
+☐ Ya
+☐ Belum
+☐ Tidak tahu	Perbaiki proses dan evaluasi klaster
+P04	Kotak P3K, oralit, obat personal, alat komunikasi, baterai, kendaraan, pengemudi, BBM, dan rute alternatif siap	
+☐ Siap
+☐ Belum siap
+☐ Tidak tahu	Lengkapi sebelum kegiatan
+P05	Tidak ada shift berlebihan, kerja malam tanpa pemulihan, tertidur sesaat tanpa sengaja, atau near-miss berulang	
+☐ Aman
+☐ Ada masalah
+☐ Tidak tahu	Perbaiki jadwal dan beban kerja
+P06	Jadwal adaptasi panas, waktu istirahat, air minum, tempat teduh, dan teman pendamping system berjalan	
+☐ Ya
+☐ Belum
+☐ Tidak tahu	Perbaiki sebelum kerja panas
+P07	Genangan/jentik, tikus, hewan sakit/mati, jamur/kebocoran, ventilasi, asap, dan genset sudah diperiksa	
+☐ Aman
+☐ Ada masalah
+☐ Tidak tahu	Nilai dan kendalikan paparan
+P08	Peringatan BMKG, BNPB/InaRISK, dan informasi wabah/SKDR setempat sudah ditinjau	
+☐ Sudah
+☐ Belum
+☐ Tidak tahu	Tinjau sebelum menyusun kegiatan
+P09	Apakah dua orang atau lebih mengalami keluhan serupa minggu ini?	
+☐ Tidak
+☐ Ya
+☐ Tidak tahu	Laporkan kepada penanggung jawab kesehatan untuk verifikasi klaster
+P10	Kontak fasilitas rujukan, waktu tempuh, sinyal/radio, serta rencana evakuasi sudah diuji	
+☐ Sudah
+☐ Belum
+☐ Tidak tahu	Uji dan perbarui rencana
+ 
+
+Kontak Penting
+Kontak	Informasi
+Petugas kesehatan tim	Nama: ____________________  Telepon/radio: ____________________
+Koordinator evakuasi	Nama: ____________________  Telepon/radio: ____________________
+Kanal perlindungan peserta (privat)	Nama/kanal: ______________________________________________
+Fasilitas rujukan terdekat	Nama: ____________________  Waktu tempuh: ______  Telepon: ______
+Gawat darurat kesehatan	PSC 119 atau nomor gawat darurat/fasilitas setempat
+Krisis psikologis	healing119.id atau telepon 119 ekstensi 8
+Kekerasan terhadap perempuan/anak	SAPA 129; WhatsApp 08-111-129-129
+ 
+
+
+
+

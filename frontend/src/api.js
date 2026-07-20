@@ -1121,5 +1121,265 @@ export const api = {
     db.chatMessages = db.chatMessages?.filter(m => m.id !== Number(messageId)) || [];
     saveDb(db);
     return { success: true };
+  },
+
+  // Dynamic Form Builder APIs
+  getForms: async () => {
+    try {
+      const res = await fetch(`${API_URL}/forms`, {
+        headers: getHeaders()
+      });
+      if (res.ok) return await res.json();
+    } catch (e) {}
+
+    // Mock fallback
+    const db = getDb();
+    return db.forms || [];
+  },
+
+  getFormDetails: async (id) => {
+    try {
+      const res = await fetch(`${API_URL}/forms/${id}`, {
+        headers: getHeaders()
+      });
+      if (res.ok) return await res.json();
+    } catch (e) {}
+
+    // Mock fallback
+    const db = getDb();
+    const form = db.forms?.find(f => f.id === Number(id));
+    if (form) {
+      const questions = db.questions?.filter(q => q.form_id === Number(id)) || [];
+      return { ...form, questions };
+    }
+    throw new Error('Form tidak ditemukan.');
+  },
+
+  saveForm: async (form) => {
+    const isEdit = !!form.id;
+    const url = isEdit ? `${API_URL}/forms/${form.id}` : `${API_URL}/forms`;
+    const method = isEdit ? 'PUT' : 'POST';
+
+    try {
+      const res = await fetch(url, {
+        method,
+        headers: getHeaders(),
+        body: JSON.stringify(form)
+      });
+      if (res.ok) return await res.json();
+    } catch (e) {}
+
+    // Mock fallback
+    const db = getDb();
+    db.forms = db.forms || [];
+    db.questions = db.questions || [];
+    let savedForm;
+    if (isEdit) {
+      const idx = db.forms.findIndex(f => f.id === Number(form.id));
+      if (idx !== -1) {
+        db.forms[idx] = {
+          ...db.forms[idx],
+          title: form.title,
+          description: form.description,
+          frequency: form.frequency,
+          target_audience: form.target_audience
+        };
+        savedForm = db.forms[idx];
+      } else {
+        throw new Error('Form tidak ditemukan.');
+      }
+      // Remove old questions for this form
+      db.questions = db.questions.filter(q => q.form_id !== Number(form.id));
+    } else {
+      savedForm = {
+        id: db.forms.length + 1,
+        title: form.title,
+        description: form.description,
+        frequency: form.frequency,
+        target_audience: form.target_audience,
+        created_at: new Date().toISOString()
+      };
+      db.forms.push(savedForm);
+    }
+
+    // Add new questions
+    if (form.questions) {
+      form.questions.forEach((q, idx) => {
+        db.questions.push({
+          id: db.questions.length + 1,
+          form_id: savedForm.id,
+          question_code: q.question_code,
+          text: q.text,
+          type: q.type,
+          options: q.options,
+          order_number: q.order_number || idx + 1,
+          trigger_condition: q.trigger_condition,
+          trigger_action_text: q.trigger_action_text
+        });
+      });
+    }
+
+    saveDb(db);
+    return { ...savedForm, questions: db.questions.filter(q => q.form_id === savedForm.id) };
+  },
+
+  deleteForm: async (id) => {
+    try {
+      const res = await fetch(`${API_URL}/forms/${id}`, {
+        method: 'DELETE',
+        headers: getHeaders()
+      });
+      if (res.ok) return await res.json();
+    } catch (e) {}
+
+    // Mock fallback
+    const db = getDb();
+    db.forms = db.forms?.filter(f => f.id !== Number(id)) || [];
+    db.questions = db.questions?.filter(q => q.form_id !== Number(id)) || [];
+    saveDb(db);
+    return { success: true };
+  },
+
+  // Dynamic Form Response APIs
+  getFormResponses: async () => {
+    try {
+      const res = await fetch(`${API_URL}/form-responses`, {
+        headers: getHeaders()
+      });
+      if (res.ok) return await res.json();
+    } catch (e) {}
+
+    // Mock fallback
+    const db = getDb();
+    const user = api.getCurrentUser();
+    if (!user) return [];
+
+    let submissions = db.submissions || [];
+    // Join details
+    submissions = submissions.map(s => {
+      const f = db.forms?.find(form => form.id === s.form_id);
+      const u = db.users?.find(usr => usr.id === s.user_id);
+      const filler = db.users?.find(usr => usr.id === s.filled_by);
+      const doc = db.users?.find(usr => usr.id === s.diagnosed_by);
+      return {
+        ...s,
+        form: f,
+        user: u,
+        filler: filler,
+        diagnosed_by: doc
+      };
+    });
+
+    if (user.role === 'ADMIN' || user.role === 'DOKTER' || user.role === 'TIM_KESEHATAN' || user.role === 'PETUGAS_KESEHATAN') {
+      return submissions;
+    } else if (user.role === 'PENANGGUNG_JAWAB_TIM') {
+      return submissions.filter(s => s.user?.team_id === user.team_id);
+    } else {
+      return submissions.filter(s => s.user_id === user.id);
+    }
+  },
+
+  getFormResponseDetails: async (id) => {
+    try {
+      const res = await fetch(`${API_URL}/form-responses/${id}`, {
+        headers: getHeaders()
+      });
+      if (res.ok) return await res.json();
+    } catch (e) {}
+
+    // Mock fallback
+    const db = getDb();
+    const submission = db.submissions?.find(s => s.id === Number(id));
+    if (!submission) throw new Error('Jawaban form tidak ditemukan.');
+
+    const f = db.forms?.find(form => form.id === submission.form_id);
+    const u = db.users?.find(usr => usr.id === submission.user_id);
+    const filler = db.users?.find(usr => usr.id === submission.filled_by);
+    const doc = db.users?.find(usr => usr.id === submission.diagnosed_by);
+
+    const submissionAnswers = db.answers?.filter(a => a.submission_id === Number(id)) || [];
+    const answersWithQuestion = submissionAnswers.map(a => {
+      const q = db.questions?.find(quest => quest.id === a.question_id);
+      return { ...a, question: q };
+    });
+
+    return {
+      ...submission,
+      form: f,
+      user: u,
+      filler: filler,
+      diagnosed_by: doc,
+      answers: answersWithQuestion
+    };
+  },
+
+  submitFormResponse: async (payload) => {
+    try {
+      const res = await fetch(`${API_URL}/form-responses`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify(payload)
+      });
+      if (res.ok) return await res.json();
+    } catch (e) {}
+
+    // Mock fallback
+    const db = getDb();
+    db.submissions = db.submissions || [];
+    db.answers = db.answers || [];
+
+    const user = api.getCurrentUser();
+    const submissionId = db.submissions.length + 1;
+
+    const submission = {
+      id: submissionId,
+      form_id: Number(payload.form_id),
+      user_id: Number(payload.user_id),
+      filled_by: user ? user.id : 1,
+      diagnosis: null,
+      diagnosed_by: null,
+      diagnosed_at: null,
+      submitted_at: new Date().toISOString(),
+      created_at: new Date().toISOString()
+    };
+
+    db.submissions.push(submission);
+
+    payload.answers.forEach(ans => {
+      db.answers.push({
+        id: db.answers.length + 1,
+        submission_id: submissionId,
+        question_id: Number(ans.question_id),
+        answer_value: typeof ans.value === 'object' ? JSON.stringify(ans.value) : String(ans.value),
+        created_at: new Date().toISOString()
+      });
+    });
+
+    saveDb(db);
+    return { message: 'Form berhasil dikirim.', submission_id: submissionId };
+  },
+
+  submitDiagnosis: async (id, diagnosis) => {
+    try {
+      const res = await fetch(`${API_URL}/form-responses/${id}/diagnosis`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify({ diagnosis })
+      });
+      if (res.ok) return await res.json();
+    } catch (e) {}
+
+    // Mock fallback
+    const db = getDb();
+    const user = api.getCurrentUser();
+    const sub = db.submissions?.find(s => s.id === Number(id));
+    if (sub) {
+      sub.diagnosis = diagnosis;
+      sub.diagnosed_by = user ? user.id : 2; // Default to Doctor (id 2)
+      sub.diagnosed_at = new Date().toISOString();
+      saveDb(db);
+      return { message: 'Diagnosa berhasil ditambahkan.', submission: sub };
+    }
+    throw new Error('Jawaban form tidak ditemukan.');
   }
 };
