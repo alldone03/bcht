@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../api';
+import { formatDateWithAge } from '../utils/dateUtils';
 import { 
   ArrowLeft, 
   Send, 
@@ -57,8 +58,9 @@ export default function FormFiller({ formId, onBack, onSubmitted }) {
             updatedCount++;
           }
         } else if ((text.includes('tanggal lahir') || text.includes('lahir')) && selectedUser.tanggal_lahir) {
-          if (updated[q.id] !== selectedUser.tanggal_lahir) {
-            updated[q.id] = selectedUser.tanggal_lahir;
+          const valWithAge = formatDateWithAge(selectedUser.tanggal_lahir);
+          if (updated[q.id] !== valWithAge) {
+            updated[q.id] = valWithAge;
             updatedCount++;
           }
         }

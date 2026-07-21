@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../api';
+import { formatDateWithAge } from '../utils/dateUtils';
 import {
   FileText,
   Search,
@@ -13,7 +14,8 @@ import {
   Stethoscope,
   ChevronRight,
   Filter,
-  RefreshCw
+  RefreshCw,
+  Calendar
 } from 'lucide-react';
 
 export default function FormResponsesList({ onBack }) {
@@ -192,6 +194,20 @@ export default function FormResponsesList({ onBack }) {
                       <div className="text-sm font-bold text-neutral">{responseDetails.user?.name}</div>
                     </div>
                   </div>
+
+                  {responseDetails.user?.tanggal_lahir && (
+                    <div className="flex items-center gap-3">
+                      <div className="bg-primary/10 p-2.5 rounded-xl text-primary">
+                        <Calendar className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <div className="text-xs text-neutral-500">Tanggal Lahir / Usia</div>
+                        <div className="text-xs font-bold text-neutral">
+                          {formatDateWithAge(responseDetails.user.tanggal_lahir)}
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="flex items-center gap-3">
                     <div className="bg-primary/10 p-2.5 rounded-xl text-primary">

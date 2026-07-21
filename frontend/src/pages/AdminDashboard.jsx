@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { api } from '../api';
+import { formatDateWithAge } from '../utils/dateUtils';
 import { Users, FileSpreadsheet, Plus, Trash2, ShieldCheck, Mail, UserPlus, Edit2, Calendar, Hash } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -302,7 +303,7 @@ export default function AdminDashboard() {
                           </td>
                           <td>
                             <span className="text-xs font-medium text-neutral-600">
-                              {user.tanggal_lahir ? new Date(user.tanggal_lahir).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '-'}
+                              {formatDateWithAge(user.tanggal_lahir)}
                             </span>
                           </td>
                           <td>
