@@ -1,13 +1,14 @@
 import React, { useState } from 'react';
 import { api } from '../api';
 import { useNavigate } from 'react-router-dom';
-import { Stethoscope, Lock, Mail, User as UserIcon, AlertCircle, ArrowRight, CheckCircle2 } from 'lucide-react';
+import { Stethoscope, Lock, Mail, User as UserIcon, AlertCircle, ArrowRight, CheckCircle2, Calendar, Hash } from 'lucide-react';
 
 export default function Register({ onRegisterSuccess }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('PESERTA');
+  const [tanggalLahir, setTanggalLahir] = useState('');
+  const [participantId, setParticipantId] = useState('');
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
@@ -20,7 +21,7 @@ export default function Register({ onRegisterSuccess }) {
     setLoading(true);
 
     try {
-      const user = await api.register(name, email, password, role);
+      const user = await api.register(name, email, password, 'PESERTA', tanggalLahir, participantId);
       setSuccess('Pendaftaran berhasil! Mengalihkan ke dashboard...');
       setTimeout(() => {
         onRegisterSuccess(user);
@@ -68,9 +69,42 @@ export default function Register({ onRegisterSuccess }) {
                 <input 
                   type="text" 
                   placeholder="Nama Lengkap Anda" 
-                  className="input input-bordered w-full pl-11 focus:input-primary transition-all rounded-lg"
+                  className="input input-bordered w-full pl-11 focus:input-primary transition-all rounded-lg text-sm"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  required 
+                />
+              </div>
+            </div>
+
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text font-semibold">ID Peserta</span>
+              </label>
+              <div className="relative">
+                <Hash className="absolute left-3.5 top-3.5 w-5 h-5 text-neutral-400" />
+                <input 
+                  type="text" 
+                  placeholder="Contoh: PT-2026-098" 
+                  className="input input-bordered w-full pl-11 focus:input-primary transition-all rounded-lg text-sm"
+                  value={participantId}
+                  onChange={(e) => setParticipantId(e.target.value)}
+                  required 
+                />
+              </div>
+            </div>
+
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text font-semibold">Tanggal Lahir</span>
+              </label>
+              <div className="relative">
+                <Calendar className="absolute left-3.5 top-3.5 w-5 h-5 text-neutral-400" />
+                <input 
+                  type="date" 
+                  className="input input-bordered w-full pl-11 focus:input-primary transition-all rounded-lg text-sm"
+                  value={tanggalLahir}
+                  onChange={(e) => setTanggalLahir(e.target.value)}
                   required 
                 />
               </div>
@@ -85,7 +119,7 @@ export default function Register({ onRegisterSuccess }) {
                 <input 
                   type="email" 
                   placeholder="name@example.com" 
-                  className="input input-bordered w-full pl-11 focus:input-primary transition-all rounded-lg"
+                  className="input input-bordered w-full pl-11 focus:input-primary transition-all rounded-lg text-sm"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required 
@@ -102,26 +136,12 @@ export default function Register({ onRegisterSuccess }) {
                 <input 
                   type="password" 
                   placeholder="Minimal 6 Karakter" 
-                  className="input input-bordered w-full pl-11 focus:input-primary transition-all rounded-lg"
+                  className="input input-bordered w-full pl-11 focus:input-primary transition-all rounded-lg text-sm"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required 
                 />
               </div>
-            </div>
-
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-semibold">Daftar Sebagai</span>
-              </label>
-              <select 
-                className="select select-bordered w-full focus:select-primary rounded-lg"
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
-              >
-                <option value="PESERTA">👤 Peserta (Umum/Pasien)</option>
-                <option value="DOKTER">🏥 Dokter Ahli</option>
-              </select>
             </div>
 
             <button 

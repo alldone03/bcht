@@ -12,7 +12,7 @@ use Illuminate\Notifications\Notifiable;
 
 use Laravel\Sanctum\HasApiTokens;
 
-#[Fillable(['name', 'email', 'password', 'role', 'role_id', 'team_id'])]
+#[Fillable(['name', 'email', 'password', 'role', 'role_id', 'team_id', 'tanggal_lahir', 'participant_id'])]
 #[Hidden(['password', 'remember_token'])]
 class User extends Authenticatable
 {
@@ -32,9 +32,14 @@ class User extends Authenticatable
         ];
     }
 
-    public function role()
+    public function roleRelation()
     {
-        return $this->belongsTo(Role::class);
+        return $this->belongsTo(Role::class, 'role_id');
+    }
+
+    public function getRoleAttribute()
+    {
+        return $this->roleRelation ? $this->roleRelation->name : ($this->attributes['role'] ?? 'PESERTA');
     }
 
     public function team()
@@ -42,14 +47,19 @@ class User extends Authenticatable
         return $this->belongsTo(Team::class);
     }
 
+    public function companions()
+    {
+        return $this->belongsToMany(User::class, 'companions', 'user_id', 'companion_id')->withTimestamps();
+    }
+
     public function hasRole(string $roleName): bool
     {
-        return $this->role && $this->role->name === strtoupper($roleName);
+        return $this->roleRelation && $this->roleRelation->name === strtoupper($roleName);
     }
 
     public function hasPermission(string $permissionName): bool
     {
-        if (!$this->role) {
+        if (!$this->roleRelation) {
             return false;
         }
 
@@ -57,6 +67,6 @@ class User extends Authenticatable
             return true;
         }
 
-        return $this->role->permissions()->where('name', $permissionName)->exists();
+        return $this->roleRelation->permissions()->where('name', $permissionName)->exists();
     }
 }

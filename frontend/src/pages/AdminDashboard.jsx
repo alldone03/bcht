@@ -1,50 +1,132 @@
-import React, { useState } from 'react';
-import { getDb, saveDb } from '../mockDb';
-import { Users, FileSpreadsheet, Plus, Trash2, ShieldCheck, Mail, UserPlus } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { api } from '../api';
+import { Users, FileSpreadsheet, Plus, Trash2, ShieldCheck, Mail, UserPlus, Edit2, Calendar, Hash } from 'lucide-react';
 
 export default function AdminDashboard() {
-  const [db, setDb] = useState(getDb());
+  const [users, setUsers] = useState([]);
+  const [forms, setForms] = useState([]);
+  const [responses, setResponses] = useState([]);
+  const [loading, setLoading] = useState(false);
+  
+  // Create state
   const [showAddModal, setShowAddModal] = useState(false);
   const [newName, setNewName] = useState('');
   const [newEmail, setNewEmail] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [newRole, setNewRole] = useState('PESERTA');
+  const [newTanggalLahir, setNewTanggalLahir] = useState('');
+  const [newParticipantId, setNewParticipantId] = useState('');
 
-  const usersCount = db.users.length;
-  const formsCount = db.forms.length;
-  const submissionsCount = db.results.length;
+  // Edit state
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editUserId, setEditUserId] = useState(null);
+  const [editName, setEditName] = useState('');
+  const [editEmail, setEditEmail] = useState('');
+  const [editPassword, setEditPassword] = useState('');
+  const [editRole, setEditRole] = useState('PESERTA');
+  const [editTanggalLahir, setEditTanggalLahir] = useState('');
+  const [editParticipantId, setEditParticipantId] = useState('');
 
-  const handleAddUser = (e) => {
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
+    try {
+      const u = await api.getUsers();
+      const f = await api.getForms();
+      const r = await api.getFormResponses();
+      setUsers(u);
+      setForms(f);
+      setResponses(r);
+    } catch (e) {
+      console.error("Gagal mengambil data admin", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddUser = async (e) => {
     e.preventDefault();
     if (!newName || !newEmail || !newPassword) return;
 
-    const newUser = {
-      id: db.users.length + 1,
-      name: newName,
-      email: newEmail,
-      password: newPassword,
-      role: newRole,
-      created_at: new Date().toISOString()
-    };
-
-    const updatedDb = { ...db, users: [...db.users, newUser] };
-    setDb(updatedDb);
-    saveDb(updatedDb);
-
-    // Reset Form
-    setNewName('');
-    setNewEmail('');
-    setNewPassword('');
-    setNewRole('PESERTA');
-    setShowAddModal(false);
+    try {
+      await api.createUser({
+        name: newName,
+        email: newEmail,
+        password: newPassword,
+        role: newRole,
+        tanggal_lahir: newTanggalLahir || null,
+        participant_id: newParticipantId || null
+      });
+      window.alert('User berhasil ditambahkan!');
+      fetchData();
+      // Reset Form
+      setNewName('');
+      setNewEmail('');
+      setNewPassword('');
+      setNewRole('PESERTA');
+      setNewTanggalLahir('');
+      setNewParticipantId('');
+      setShowAddModal(false);
+    } catch (err) {
+      window.alert('Gagal menambahkan user: ' + err.message);
+    }
   };
 
-  const handleDeleteUser = (id) => {
+  const handleOpenEdit = (user) => {
+    setEditUserId(user.id);
+    setEditName(user.name || '');
+    setEditEmail(user.email || '');
+    setEditPassword('');
+    setEditRole(user.role && user.role.name ? user.role.name : (user.role || 'PESERTA'));
+    setEditTanggalLahir(user.tanggal_lahir || '');
+    setEditParticipantId(user.participant_id || '');
+    setShowEditModal(true);
+  };
+
+  const handleEditUser = async (e) => {
+    e.preventDefault();
+    try {
+      await api.updateUser(editUserId, {
+        name: editName,
+        email: editEmail,
+        password: editPassword || undefined,
+        role: editRole,
+        tanggal_lahir: editTanggalLahir || null,
+        participant_id: editParticipantId || null
+      });
+      window.alert('User berhasil diperbarui!');
+      fetchData();
+      setShowEditModal(false);
+    } catch (err) {
+      window.alert('Gagal memperbarui user: ' + err.message);
+    }
+  };
+
+  const handleDeleteUser = async (id) => {
     if (confirm('Apakah Anda yakin ingin menghapus user ini?')) {
-      const updatedUsers = db.users.filter(u => u.id !== id);
-      const updatedDb = { ...db, users: updatedUsers };
-      setDb(updatedDb);
-      saveDb(updatedDb);
+      try {
+        await api.deleteUser(id);
+        window.alert('User berhasil dihapus!');
+        fetchData();
+      } catch (err) {
+        window.alert('Gagal menghapus user: ' + err.message);
+      }
+    }
+  };
+
+  const usersCount = users.length;
+  const formsCount = forms.length;
+  const submissionsCount = responses.length;
+
+  const roleBadgeColor = (roleStr) => {
+    switch (roleStr) {
+      case 'ADMIN': return 'badge-error';
+      case 'DOKTER': return 'badge-primary';
+      case 'PESERTA': return 'badge-secondary';
+      default: return 'badge-neutral';
     }
   };
 
@@ -53,158 +135,297 @@ export default function AdminDashboard() {
       {/* Page Header */}
       <div>
         <h1 className="text-3xl font-heading font-black text-neutral">Admin Control Panel</h1>
-        <p className="text-sm text-neutral-500 mt-1">Supervising users, metadata screening forms, and metrics.</p>
+        <p className="text-sm text-neutral-500 mt-1">Mengelola pengguna, formulir penapisan kesehatan, dan analisis metrik.</p>
       </div>
 
-      {/* Metrics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="card bg-base-100 shadow-xl border border-base-200">
-          <div className="card-body flex-row items-center gap-4">
-            <div className="p-4 bg-primary/10 text-primary rounded-2xl">
-              <Users className="w-6 h-6" />
-            </div>
-            <div>
-              <p className="text-xs text-neutral-500 font-bold uppercase tracking-wider">Total User</p>
-              <h2 className="text-3xl font-heading font-black text-neutral mt-1">{usersCount}</h2>
-            </div>
-          </div>
+      {loading ? (
+        <div className="text-center py-12">
+          <span className="loading loading-spinner text-primary" />
+          <p className="text-xs text-neutral-500 mt-2">Memuat data...</p>
         </div>
+      ) : (
+        <>
+          {/* Metrics Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div className="card bg-base-100 shadow-xl border border-base-200">
+              <div className="card-body flex-row items-center gap-4">
+                <div className="p-4 bg-primary/10 text-primary rounded-2xl">
+                  <Users className="w-6 h-6" />
+                </div>
+                <div>
+                  <p className="text-xs text-neutral-500 font-bold uppercase tracking-wider">Total User</p>
+                  <h2 className="text-3xl font-heading font-black text-neutral mt-1">{usersCount}</h2>
+                </div>
+              </div>
+            </div>
 
-        <div className="card bg-base-100 shadow-xl border border-base-200">
-          <div className="card-body flex-row items-center gap-4">
-            <div className="p-4 bg-secondary/10 text-secondary rounded-2xl">
-              <FileSpreadsheet className="w-6 h-6" />
+            <div className="card bg-base-100 shadow-xl border border-base-200">
+              <div className="card-body flex-row items-center gap-4">
+                <div className="p-4 bg-secondary/10 text-secondary rounded-2xl">
+                  <FileSpreadsheet className="w-6 h-6" />
+                </div>
+                <div>
+                  <p className="text-xs text-neutral-500 font-bold uppercase tracking-wider">Form Screening</p>
+                  <h2 className="text-3xl font-heading font-black text-neutral mt-1">{formsCount}</h2>
+                </div>
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-neutral-500 font-bold uppercase tracking-wider">Form Screening</p>
-              <h2 className="text-3xl font-heading font-black text-neutral mt-1">{formsCount}</h2>
-            </div>
-          </div>
-        </div>
 
-        <div className="card bg-base-100 shadow-xl border border-base-200">
-          <div className="card-body flex-row items-center gap-4">
-            <div className="p-4 bg-accent/10 text-accent rounded-2xl">
-              <ShieldCheck className="w-6 h-6" />
+            <div className="card bg-base-100 shadow-xl border border-base-200">
+              <div className="card-body flex-row items-center gap-4">
+                <div className="p-4 bg-accent/10 text-accent rounded-2xl">
+                  <ShieldCheck className="w-6 h-6" />
+                </div>
+                <div>
+                  <p className="text-xs text-neutral-500 font-bold uppercase tracking-wider">Total Submisi</p>
+                  <h2 className="text-3xl font-heading font-black text-neutral mt-1">{submissionsCount}</h2>
+                </div>
+              </div>
             </div>
-            <div>
-              <p className="text-xs text-neutral-500 font-bold uppercase tracking-wider">Total Submisi</p>
-              <h2 className="text-3xl font-heading font-black text-neutral mt-1">{submissionsCount}</h2>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Users Management */}
-      <div className="card bg-base-100 shadow-xl border border-base-200">
-        <div className="card-body">
-          <div className="flex justify-between items-center mb-6">
-            <h3 className="font-heading font-bold text-lg text-neutral">Daftar Pengguna Sistem</h3>
-            <button onClick={() => setShowAddModal(true)} className="btn btn-primary btn-sm rounded-lg">
-              <UserPlus className="w-4 h-4 mr-1.5" /> Tambah User
-            </button>
           </div>
 
-          <div className="overflow-x-auto w-full">
-            <table className="table w-full">
-              <thead>
-                <tr>
-                  <th>Nama</th>
-                  <th>Email</th>
-                  <th>Role</th>
-                  <th>Tanggal Terdaftar</th>
-                  <th>Aksi</th>
-                </tr>
-              </thead>
-              <tbody>
-                {db.users.map((user) => (
-                  <tr key={user.id} className="hover">
-                    <td>
-                      <div className="font-bold text-sm">{user.name}</div>
-                    </td>
-                    <td>
-                      <span className="font-mono text-xs">{user.email}</span>
-                    </td>
-                    <td>
-                      <span className={`badge badge-sm font-semibold rounded-md ${
-                        user.role === 'ADMIN' ? 'badge-error' : user.role === 'DOKTER' ? 'badge-primary' : 'badge-secondary'
-                      }`}>
-                        {user.role}
-                      </span>
-                    </td>
-                    <td>
-                      <span className="text-xs text-neutral-500">
-                        {new Date(user.created_at).toLocaleDateString('id-ID')}
-                      </span>
-                    </td>
-                    <td>
-                      <button 
-                        onClick={() => handleDeleteUser(user.id)} 
-                        className="btn btn-ghost btn-xs text-error"
-                        disabled={user.id === 1} // Can't delete main admin
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+          {/* Users Management */}
+          <div className="card bg-base-100 shadow-xl border border-base-200">
+            <div className="card-body">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="font-heading font-bold text-lg text-neutral">Daftar Pengguna Sistem</h3>
+                <button onClick={() => setShowAddModal(true)} className="btn btn-primary btn-sm rounded-xl font-bold gap-1 px-4">
+                  <UserPlus className="w-4 h-4" /> Tambah User
+                </button>
+              </div>
+
+              <div className="overflow-x-auto w-full">
+                <table className="table w-full">
+                  <thead>
+                    <tr>
+                      <th>Nama Lengkap</th>
+                      <th>Email / ID Peserta</th>
+                      <th>Tanggal Lahir</th>
+                      <th>Role</th>
+                      <th>Tanggal Daftar</th>
+                      <th>Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {users.map((user) => {
+                      const currentRoleName = user.role && user.role.name ? user.role.name : (user.role || 'PESERTA');
+                      return (
+                        <tr key={user.id} className="hover">
+                          <td>
+                            <div className="font-bold text-sm text-neutral">{user.name}</div>
+                          </td>
+                          <td>
+                            <div className="flex flex-col gap-0.5">
+                              <span className="font-mono text-xs text-neutral-500">{user.email}</span>
+                              {user.participant_id && (
+                                <span className="badge badge-ghost badge-xs font-mono text-[9px] px-1.5 py-1 rounded">
+                                  ID: {user.participant_id}
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td>
+                            <span className="text-xs font-medium text-neutral-600">
+                              {user.tanggal_lahir ? new Date(user.tanggal_lahir).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' }) : '-'}
+                            </span>
+                          </td>
+                          <td>
+                            <span className={`badge badge-sm font-bold uppercase rounded-lg px-2.5 py-1.5 ${roleBadgeColor(currentRoleName)}`}>
+                              {currentRoleName}
+                            </span>
+                          </td>
+                          <td>
+                            <span className="text-xs text-neutral-500">
+                              {new Date(user.created_at || user.updated_at).toLocaleDateString('id-ID')}
+                            </span>
+                          </td>
+                          <td>
+                            <div className="flex items-center gap-1">
+                              <button 
+                                onClick={() => handleOpenEdit(user)} 
+                                className="btn btn-ghost btn-xs text-primary p-1"
+                                title="Edit User / Assign Role"
+                              >
+                                <Edit2 className="w-4 h-4" />
+                              </button>
+                              <button 
+                                onClick={() => handleDeleteUser(user.id)} 
+                                className="btn btn-ghost btn-xs text-error p-1"
+                                disabled={user.id === 1} // Can't delete main admin
+                                title="Hapus User"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
+        </>
+      )}
 
       {/* Add User Modal */}
       {showAddModal && (
         <div className="modal modal-open">
-          <div className="modal-box max-w-sm rounded-2xl">
+          <div className="modal-box max-w-md rounded-3xl border border-base-200 shadow-2xl p-6">
             <h3 className="font-heading font-bold text-lg text-neutral mb-4">Tambah Pengguna Baru</h3>
             <form onSubmit={handleAddUser} className="space-y-4">
               <div className="form-control">
-                <label className="label"><span className="label-text">Nama Lengkap</span></label>
+                <label className="label"><span className="label-text text-xs font-bold">Nama Lengkap</span></label>
                 <input 
                   type="text" 
-                  className="input input-bordered w-full rounded-lg" 
+                  className="input input-bordered w-full rounded-xl text-sm" 
                   value={newName} 
                   onChange={(e) => setNewName(e.target.value)} 
                   required 
                 />
               </div>
               <div className="form-control">
-                <label className="label"><span className="label-text">Email</span></label>
+                <label className="label"><span className="label-text text-xs font-bold">ID Peserta</span></label>
+                <input 
+                  type="text" 
+                  placeholder="Contoh: PT-2026-098"
+                  className="input input-bordered w-full rounded-xl text-sm" 
+                  value={newParticipantId} 
+                  onChange={(e) => setNewParticipantId(e.target.value)} 
+                />
+              </div>
+              <div className="form-control">
+                <label className="label"><span className="label-text text-xs font-bold">Tanggal Lahir</span></label>
+                <input 
+                  type="date" 
+                  className="input input-bordered w-full rounded-xl text-sm" 
+                  value={newTanggalLahir} 
+                  onChange={(e) => setNewTanggalLahir(e.target.value)} 
+                />
+              </div>
+              <div className="form-control">
+                <label className="label"><span className="label-text text-xs font-bold">Email</span></label>
                 <input 
                   type="email" 
-                  className="input input-bordered w-full rounded-lg" 
+                  className="input input-bordered w-full rounded-xl text-sm" 
                   value={newEmail} 
                   onChange={(e) => setNewEmail(e.target.value)} 
                   required 
                 />
               </div>
               <div className="form-control">
-                <label className="label"><span className="label-text">Password</span></label>
+                <label className="label"><span className="label-text text-xs font-bold">Password</span></label>
                 <input 
                   type="password" 
-                  className="input input-bordered w-full rounded-lg" 
+                  className="input input-bordered w-full rounded-xl text-sm" 
                   value={newPassword} 
                   onChange={(e) => setNewPassword(e.target.value)} 
                   required 
                 />
               </div>
               <div className="form-control">
-                <label className="label"><span className="label-text">Role</span></label>
+                <label className="label"><span className="label-text text-xs font-bold">Role</span></label>
                 <select 
-                  className="select select-bordered w-full rounded-lg" 
+                  className="select select-bordered w-full rounded-xl text-sm" 
                   value={newRole} 
                   onChange={(e) => setNewRole(e.target.value)}
                 >
                   <option value="PESERTA">PESERTA</option>
                   <option value="DOKTER">DOKTER</option>
                   <option value="ADMIN">ADMIN</option>
+                  <option value="TIM_KESEHATAN">TIM_KESEHATAN</option>
+                  <option value="PENANGGUNG_JAWAB_TIM">PENANGGUNG_JAWAB_TIM</option>
+                  <option value="PETUGAS_KESEHATAN">PETUGAS_KESEHATAN</option>
+                  <option value="TEMAN_PENDAMPING">TEMAN_PENDAMPING</option>
                 </select>
               </div>
               <div className="modal-action">
-                <button type="button" onClick={() => setShowAddModal(false)} className="btn btn-ghost">Batal</button>
-                <button type="submit" className="btn btn-primary rounded-lg">Simpan</button>
+                <button type="button" onClick={() => setShowAddModal(false)} className="btn btn-ghost rounded-xl">Batal</button>
+                <button type="submit" className="btn btn-primary rounded-xl font-bold text-white px-6">Simpan</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit User Modal */}
+      {showEditModal && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-md rounded-3xl border border-base-200 shadow-2xl p-6">
+            <h3 className="font-heading font-bold text-lg text-neutral mb-4">Edit / Ubah Peran Pengguna</h3>
+            <form onSubmit={handleEditUser} className="space-y-4">
+              <div className="form-control">
+                <label className="label"><span className="label-text text-xs font-bold">Nama Lengkap</span></label>
+                <input 
+                  type="text" 
+                  className="input input-bordered w-full rounded-xl text-sm" 
+                  value={editName} 
+                  onChange={(e) => setEditName(e.target.value)} 
+                  required 
+                />
+              </div>
+              <div className="form-control">
+                <label className="label"><span className="label-text text-xs font-bold">ID Peserta</span></label>
+                <input 
+                  type="text" 
+                  placeholder="Contoh: PT-2026-098"
+                  className="input input-bordered w-full rounded-xl text-sm" 
+                  value={editParticipantId} 
+                  onChange={(e) => setEditParticipantId(e.target.value)} 
+                />
+              </div>
+              <div className="form-control">
+                <label className="label"><span className="label-text text-xs font-bold">Tanggal Lahir</span></label>
+                <input 
+                  type="date" 
+                  className="input input-bordered w-full rounded-xl text-sm" 
+                  value={editTanggalLahir} 
+                  onChange={(e) => setEditTanggalLahir(e.target.value)} 
+                />
+              </div>
+              <div className="form-control">
+                <label className="label"><span className="label-text text-xs font-bold">Email</span></label>
+                <input 
+                  type="email" 
+                  className="input input-bordered w-full rounded-xl text-sm" 
+                  value={editEmail} 
+                  onChange={(e) => setEditEmail(e.target.value)} 
+                  required 
+                />
+              </div>
+              <div className="form-control">
+                <label className="label">
+                  <span className="label-text text-xs font-bold">Password Baru</span>
+                  <span className="label-text-alt text-[9px] text-neutral-400">Kosongkan jika tidak ingin diubah</span>
+                </label>
+                <input 
+                  type="password" 
+                  className="input input-bordered w-full rounded-xl text-sm" 
+                  value={editPassword} 
+                  onChange={(e) => setEditPassword(e.target.value)} 
+                  placeholder="Minimal 6 karakter"
+                />
+              </div>
+              <div className="form-control">
+                <label className="label"><span className="label-text text-xs font-bold">Role (Assign Role)</span></label>
+                <select 
+                  className="select select-bordered w-full rounded-xl text-sm" 
+                  value={editRole} 
+                  onChange={(e) => setEditRole(e.target.value)}
+                >
+                  <option value="PESERTA">PESERTA</option>
+                  <option value="DOKTER">DOKTER</option>
+                  <option value="ADMIN">ADMIN</option>
+                  <option value="TIM_KESEHATAN">TIM_KESEHATAN</option>
+                  <option value="PENANGGUNG_JAWAB_TIM">PENANGGUNG_JAWAB_TIM</option>
+                  <option value="PETUGAS_KESEHATAN">PETUGAS_KESEHATAN</option>
+                  <option value="TEMAN_PENDAMPING">TEMAN_PENDAMPING</option>
+                </select>
+              </div>
+              <div className="modal-action">
+                <button type="button" onClick={() => setShowEditModal(false)} className="btn btn-ghost rounded-xl">Batal</button>
+                <button type="submit" className="btn btn-primary rounded-xl font-bold text-white px-6">Perbarui</button>
               </div>
             </form>
           </div>

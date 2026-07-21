@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../api';
-import { 
-  FileText, 
-  Search, 
-  User, 
-  Activity, 
-  Clock, 
-  CheckCircle, 
-  Edit3, 
+import {
+  FileText,
+  Search,
+  User,
+  Activity,
+  Clock,
+  CheckCircle,
+  Edit3,
   ArrowLeft,
   X,
   Stethoscope,
   ChevronRight,
-  Filter
+  Filter,
+  RefreshCw
 } from 'lucide-react';
 
 export default function FormResponsesList({ onBack }) {
@@ -97,12 +98,12 @@ export default function FormResponsesList({ onBack }) {
 
   // Filter logic
   const filteredResponses = responses.filter(r => {
-    const matchesSearch = 
+    const matchesSearch =
       r.user?.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
       r.form?.title?.toLowerCase().includes(searchTerm.toLowerCase());
-    
+
     const matchesForm = selectedFormTitle === 'ALL' || r.form?.title === selectedFormTitle;
-    
+
     return matchesSearch && matchesForm;
   });
 
@@ -145,7 +146,7 @@ export default function FormResponsesList({ onBack }) {
                 <h3 className="text-sm font-bold text-neutral-800 border-l-4 border-primary pl-2 uppercase tracking-wide">
                   Jawaban Pertanyaan
                 </h3>
-                
+
                 <div className="space-y-4">
                   {responseDetails.answers && responseDetails.answers.map((ans, idx) => {
                     let parsedVal = ans.answer_value;
@@ -154,7 +155,7 @@ export default function FormResponsesList({ onBack }) {
                       if (Array.isArray(jsonVal)) {
                         parsedVal = jsonVal.join(', ');
                       }
-                    } catch (e) {}
+                    } catch (e) { }
 
                     return (
                       <div key={idx} className="p-4 border border-base-150 rounded-2xl bg-base-50/50 space-y-1">
@@ -211,7 +212,7 @@ export default function FormResponsesList({ onBack }) {
                     <div>
                       <div className="text-xs text-neutral-500">Pengisi Formulir</div>
                       <div className="text-xs font-semibold text-neutral">
-                        {responseDetails.filler?.name} 
+                        {responseDetails.filler?.name}
                         {responseDetails.user_id !== responseDetails.filled_by && (
                           <span className="text-[10px] text-primary block">(Teman Pendamping)</span>
                         )}
@@ -248,16 +249,16 @@ export default function FormResponsesList({ onBack }) {
                       <label className="label text-[10px] uppercase font-bold text-neutral-500">
                         {responseDetails.diagnosis ? 'Ubah Diagnosa' : 'Tulis Diagnosa Baru'}
                       </label>
-                      <textarea 
-                        value={diagnosis} 
-                        onChange={(e) => setDiagnosis(e.target.value)} 
+                      <textarea
+                        value={diagnosis}
+                        onChange={(e) => setDiagnosis(e.target.value)}
                         className="textarea textarea-bordered w-full text-xs rounded-xl h-24"
                         placeholder="Ketik catatan medis atau diagnosa hasil evaluasi form..."
                       />
                     </div>
-                    <button 
-                      type="submit" 
-                      disabled={submittingDiag} 
+                    <button
+                      type="submit"
+                      disabled={submittingDiag}
                       className="btn btn-primary btn-sm rounded-xl w-full text-white"
                     >
                       {submittingDiag ? <span className="loading loading-spinner w-4 h-4" /> : 'Simpan Diagnosa'}
@@ -288,20 +289,20 @@ export default function FormResponsesList({ onBack }) {
       <div className="card bg-base-100 shadow border border-base-200 p-4 rounded-3xl flex flex-col md:flex-row gap-4 items-center justify-between">
         <div className="relative w-full md:max-w-xs">
           <Search className="absolute left-3 top-3 w-4 h-4 text-neutral-400" />
-          <input 
-            type="text" 
-            value={searchTerm} 
-            onChange={(e) => setSearchTerm(e.target.value)} 
-            className="input input-bordered input-sm rounded-xl pl-9 w-full font-medium" 
-            placeholder="Cari nama pasien..." 
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="input input-bordered input-sm rounded-xl pl-9 w-full font-medium"
+            placeholder="Cari nama pasien..."
           />
         </div>
 
         <div className="flex gap-2 items-center w-full md:w-auto">
           <Filter className="w-4 h-4 text-neutral-400 shrink-0" />
-          <select 
-            value={selectedFormTitle} 
-            onChange={(e) => setSelectedFormTitle(e.target.value)} 
+          <select
+            value={selectedFormTitle}
+            onChange={(e) => setSelectedFormTitle(e.target.value)}
             className="select select-bordered select-sm rounded-xl w-full md:w-auto font-medium"
           >
             {uniqueFormTitles.map((title) => (
@@ -367,8 +368,8 @@ export default function FormResponsesList({ onBack }) {
                       )}
                     </td>
                     <td className="text-right">
-                      <button 
-                        onClick={() => handleOpenReview(r)} 
+                      <button
+                        onClick={() => handleOpenReview(r)}
                         className="btn btn-ghost btn-xs text-primary font-bold gap-1 hover:bg-primary/10 rounded-lg px-2"
                       >
                         Lihat <ChevronRight className="w-3.5 h-3.5" />

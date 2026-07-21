@@ -18,15 +18,12 @@ export default function Sidebar({ role, activeTab, setActiveTab }) {
       { id: 'users', name: 'Manajemen User', icon: Users }
     ],
     DOKTER: [
-      { id: 'mews-submissions', name: 'Hasil M-EWS', icon: ClipboardList },
-      { id: 'mews-builder', name: 'Builder M-EWS', icon: FilePlus },
       { id: 'forms-builder', name: 'Form Builder', icon: FilePlus },
+      { id: 'forms-list', name: 'Isi Formulir', icon: ClipboardList },
       { id: 'forms-responses', name: 'Respon Form', icon: FileSpreadsheet },
-      { id: 'mews-chats', name: 'Supervisi Chat', icon: MessageSquare }
+      { id: 'supervisi-chat', name: 'Supervisi Chat', icon: MessageSquare }
     ],
     PESERTA: [
-      { id: 'mews', name: 'Screening M-EWS', icon: ClipboardList },
-      { id: 'mews-history', name: 'Riwayat M-EWS', icon: History },
       { id: 'forms-list', name: 'Daftar Form', icon: FileSpreadsheet },
       { id: 'forms-responses', name: 'Riwayat Form', icon: History },
       { id: 'chat', name: 'Chatbot AI', icon: MessageSquare }

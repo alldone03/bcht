@@ -1,18 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../api';
-import { 
-  Plus, 
-  Trash2, 
-  Save, 
-  ArrowLeft, 
-  Edit, 
-  RefreshCw, 
-  Eye, 
-  Settings, 
-  CheckSquare, 
+import {
+  Plus,
+  Trash2,
+  Save,
+  ArrowLeft,
+  Edit,
+  RefreshCw,
+  Eye,
+  Settings,
+  CheckSquare,
   Sliders,
   ChevronDown,
-  ChevronUp
+  ChevronUp,
+  X
 } from 'lucide-react';
 
 export default function FormBuilder({ onBack }) {
@@ -223,9 +224,9 @@ export default function FormBuilder({ onBack }) {
             <ArrowLeft className="w-4 h-4" /> Kembali ke Daftar
           </button>
           <div className="flex gap-2 w-full sm:w-auto">
-            <button 
-              onClick={handleSaveForm} 
-              disabled={saving} 
+            <button
+              onClick={handleSaveForm}
+              disabled={saving}
               className="btn btn-primary gap-2 rounded-xl text-white flex-1 sm:flex-initial"
             >
               {saving ? <span className="loading loading-spinner w-4 h-4" /> : <Save className="w-4 h-4" />}
@@ -245,20 +246,20 @@ export default function FormBuilder({ onBack }) {
             <div className="space-y-4">
               <div className="form-control">
                 <label className="label font-bold text-xs text-neutral">Judul Form</label>
-                <input 
-                  type="text" 
-                  value={title} 
-                  onChange={(e) => setTitle(e.target.value)} 
+                <input
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
                   className="input input-bordered w-full rounded-xl"
-                  placeholder="Contoh: Form 3 — Check-in Harian" 
+                  placeholder="Contoh: Form 3 — Check-in Harian"
                 />
               </div>
 
               <div className="form-control">
                 <label className="label font-bold text-xs text-neutral">Deskripsi Singkat</label>
-                <textarea 
-                  value={description} 
-                  onChange={(e) => setDescription(e.target.value)} 
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
                   className="textarea textarea-bordered w-full rounded-xl h-24"
                   placeholder="Informasi pengisian..."
                 />
@@ -266,9 +267,9 @@ export default function FormBuilder({ onBack }) {
 
               <div className="form-control">
                 <label className="label font-bold text-xs text-neutral">Frekuensi Pengisian</label>
-                <select 
-                  value={frequency} 
-                  onChange={(e) => setFrequency(e.target.value)} 
+                <select
+                  value={frequency}
+                  onChange={(e) => setFrequency(e.target.value)}
                   className="select select-bordered w-full rounded-xl"
                 >
                   <option value="ONCE">Satu Kali Saja (Sekali)</option>
@@ -284,11 +285,11 @@ export default function FormBuilder({ onBack }) {
                 <div className="space-y-2 max-h-48 overflow-y-auto p-2 border rounded-xl bg-base-50">
                   {['PESERTA', 'TIM_KESEHATAN', 'PENANGGUNG_JAWAB_TIM', 'PETUGAS_KESEHATAN', 'TEMAN_PENDAMPING', 'DOKTER', 'ADMIN'].map((role) => (
                     <label key={role} className="flex items-center gap-2 cursor-pointer py-1">
-                      <input 
-                        type="checkbox" 
-                        checked={targetAudience.includes(role)} 
-                        onChange={() => toggleAudience(role)} 
-                        className="checkbox checkbox-xs checkbox-primary" 
+                      <input
+                        type="checkbox"
+                        checked={targetAudience.includes(role)}
+                        onChange={() => toggleAudience(role)}
+                        className="checkbox checkbox-xs checkbox-primary"
                       />
                       <span className="text-xs text-neutral font-medium">{role}</span>
                     </label>
@@ -306,8 +307,8 @@ export default function FormBuilder({ onBack }) {
                   <Sliders className="w-5 h-5 text-primary" />
                   <h2 className="text-lg font-bold text-neutral">Daftar Pertanyaan ({questions.length})</h2>
                 </div>
-                <button 
-                  onClick={handleAddQuestion} 
+                <button
+                  onClick={handleAddQuestion}
                   className="btn btn-outline btn-primary btn-sm gap-1 rounded-xl"
                 >
                   <Plus className="w-4 h-4" /> Tambah Pertanyaan
@@ -319,22 +320,22 @@ export default function FormBuilder({ onBack }) {
                   <div key={idx} className="p-4 border rounded-2xl bg-base-50 border-base-200 relative group space-y-4">
                     {/* Position controls */}
                     <div className="absolute right-4 top-4 flex gap-1 items-center">
-                      <button 
-                        onClick={() => moveQuestion(idx, 'up')} 
-                        disabled={idx === 0} 
+                      <button
+                        onClick={() => moveQuestion(idx, 'up')}
+                        disabled={idx === 0}
                         className="btn btn-ghost btn-xs text-neutral p-1 disabled:opacity-35"
                       >
                         <ChevronUp className="w-4 h-4" />
                       </button>
-                      <button 
-                        onClick={() => moveQuestion(idx, 'down')} 
-                        disabled={idx === questions.length - 1} 
+                      <button
+                        onClick={() => moveQuestion(idx, 'down')}
+                        disabled={idx === questions.length - 1}
                         className="btn btn-ghost btn-xs text-neutral p-1 disabled:opacity-35"
                       >
                         <ChevronDown className="w-4 h-4" />
                       </button>
-                      <button 
-                        onClick={() => handleRemoveQuestion(idx)} 
+                      <button
+                        onClick={() => handleRemoveQuestion(idx)}
                         className="btn btn-ghost btn-xs text-red-500 hover:bg-red-50 p-1"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -345,21 +346,21 @@ export default function FormBuilder({ onBack }) {
                       {/* Code */}
                       <div className="form-control sm:col-span-1">
                         <label className="label text-[10px] uppercase tracking-wider font-bold text-neutral-500">Kode Pertanyaan</label>
-                        <input 
-                          type="text" 
-                          value={q.question_code} 
-                          onChange={(e) => handleQuestionChange(idx, 'question_code', e.target.value)} 
+                        <input
+                          type="text"
+                          value={q.question_code}
+                          onChange={(e) => handleQuestionChange(idx, 'question_code', e.target.value)}
                           className="input input-bordered input-sm rounded-lg"
-                          placeholder="Misal: A01" 
+                          placeholder="Misal: A01"
                         />
                       </div>
-                      
+
                       {/* Type */}
                       <div className="form-control sm:col-span-3">
                         <label className="label text-[10px] uppercase tracking-wider font-bold text-neutral-500">Tipe Input Jawaban</label>
-                        <select 
-                          value={q.type} 
-                          onChange={(e) => handleQuestionChange(idx, 'type', e.target.value)} 
+                        <select
+                          value={q.type}
+                          onChange={(e) => handleQuestionChange(idx, 'type', e.target.value)}
                           className="select select-bordered select-sm rounded-lg"
                         >
                           <option value="text">Isian Singkat (Text)</option>
@@ -374,12 +375,12 @@ export default function FormBuilder({ onBack }) {
                     {/* Question Text */}
                     <div className="form-control">
                       <label className="label text-[10px] uppercase tracking-wider font-bold text-neutral-500">Teks Pertanyaan</label>
-                      <input 
-                        type="text" 
-                        value={q.text} 
-                        onChange={(e) => handleQuestionChange(idx, 'text', e.target.value)} 
+                      <input
+                        type="text"
+                        value={q.text}
+                        onChange={(e) => handleQuestionChange(idx, 'text', e.target.value)}
                         className="input input-bordered input-sm rounded-lg w-full"
-                        placeholder="Contoh: Apakah Anda pernah mengalami demam?" 
+                        placeholder="Contoh: Apakah Anda pernah mengalami demam?"
                       />
                     </div>
 
@@ -388,8 +389,8 @@ export default function FormBuilder({ onBack }) {
                       <div className="p-3 border rounded-xl bg-white border-base-200 space-y-2">
                         <div className="flex justify-between items-center mb-1">
                           <label className="text-xs font-bold text-neutral-600">Pilihan Jawaban</label>
-                          <button 
-                            onClick={() => handleAddOption(idx)} 
+                          <button
+                            onClick={() => handleAddOption(idx)}
                             className="btn btn-xs btn-ghost text-primary font-bold gap-1"
                           >
                             <Plus className="w-3 h-3" /> Tambah Opsi
@@ -397,15 +398,15 @@ export default function FormBuilder({ onBack }) {
                         </div>
                         {q.options && q.options.map((opt, optIdx) => (
                           <div key={optIdx} className="flex gap-2 items-center">
-                            <input 
-                              type="text" 
-                              value={opt} 
-                              onChange={(e) => handleOptionChange(idx, optIdx, e.target.value)} 
+                            <input
+                              type="text"
+                              value={opt}
+                              onChange={(e) => handleOptionChange(idx, optIdx, e.target.value)}
                               className="input input-bordered input-xs rounded-md flex-1"
-                              placeholder={`Opsi ${optIdx + 1}`} 
+                              placeholder={`Opsi ${optIdx + 1}`}
                             />
-                            <button 
-                              onClick={() => handleRemoveOption(idx, optIdx)} 
+                            <button
+                              onClick={() => handleRemoveOption(idx, optIdx)}
                               className="btn btn-ghost btn-xs text-red-500 hover:bg-red-50 p-1"
                             >
                               <X className="w-3 h-3" />
@@ -423,41 +424,41 @@ export default function FormBuilder({ onBack }) {
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                         <div className="form-control">
                           <label className="label text-[9px] uppercase tracking-wider font-bold text-neutral-500">Tampilkan Bila (Kode Pertanyaan)</label>
-                          <input 
-                            type="text" 
-                            value={q.trigger_condition?.depends_on || ''} 
+                          <input
+                            type="text"
+                            value={q.trigger_condition?.depends_on || ''}
                             onChange={(e) => {
                               const val = e.target.value;
                               const updatedCond = val ? { ...q.trigger_condition, depends_on: val } : null;
                               handleQuestionChange(idx, 'trigger_condition', updatedCond);
                             }}
                             className="input input-bordered input-xs rounded-md"
-                            placeholder="Misal: A08 (kosongkan jika selalu muncul)" 
+                            placeholder="Misal: A08 (kosongkan jika selalu muncul)"
                           />
                         </div>
                         <div className="form-control">
                           <label className="label text-[9px] uppercase tracking-wider font-bold text-neutral-500">Nilai Jawaban Pemicu</label>
-                          <input 
-                            type="text" 
-                            value={q.trigger_condition?.value || ''} 
+                          <input
+                            type="text"
+                            value={q.trigger_condition?.value || ''}
                             onChange={(e) => {
                               const val = e.target.value;
                               const updatedCond = q.trigger_condition?.depends_on ? { ...q.trigger_condition, value: val } : null;
                               handleQuestionChange(idx, 'trigger_condition', updatedCond);
                             }}
                             className="input input-bordered input-xs rounded-md"
-                            placeholder="Misal: Ya" 
+                            placeholder="Misal: Ya"
                           />
                         </div>
                       </div>
                       <div className="form-control">
                         <label className="label text-[9px] uppercase tracking-wider font-bold text-neutral-500">Bila Terpicu (Rekomendasi Tindakan / Alert Klinis)</label>
-                        <input 
-                          type="text" 
-                          value={q.trigger_action_text || ''} 
+                        <input
+                          type="text"
+                          value={q.trigger_action_text || ''}
                           onChange={(e) => handleQuestionChange(idx, 'trigger_action_text', e.target.value)}
                           className="input input-bordered input-xs rounded-md"
-                          placeholder="Misal: Rujuk ke petugas medis lapangan sebelum bertugas" 
+                          placeholder="Misal: Rujuk ke petugas medis lapangan sebelum bertugas"
                         />
                       </div>
                     </div>
@@ -533,14 +534,14 @@ export default function FormBuilder({ onBack }) {
                 </div>
 
                 <div className="flex gap-2">
-                  <button 
-                    onClick={() => handleEditForm(form.id)} 
+                  <button
+                    onClick={() => handleEditForm(form.id)}
                     className="btn btn-outline btn-neutral btn-sm rounded-xl flex-1 text-xs gap-1"
                   >
                     <Edit className="w-3.5 h-3.5" /> Sunting
                   </button>
-                  <button 
-                    onClick={() => handleDeleteForm(form.id)} 
+                  <button
+                    onClick={() => handleDeleteForm(form.id)}
                     className="btn btn-ghost btn-sm text-red-500 hover:bg-red-50 rounded-xl px-2"
                   >
                     <Trash2 className="w-4 h-4" />

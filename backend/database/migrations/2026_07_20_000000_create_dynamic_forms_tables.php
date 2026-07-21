@@ -95,6 +95,19 @@ return new class extends Migration
             $table->text('answer_value'); // can be string or JSON
             $table->timestamps();
         });
+
+        // 10. Update Teams with Leader ID (Coordinator)
+        Schema::table('teams', function (Blueprint $table) {
+            $table->foreignId('leader_id')->nullable()->constrained('users')->onDelete('set null');
+        });
+
+        // 11. Create Companions Pivot Table (Self-referencing companionship)
+        Schema::create('companions', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
+            $table->foreignId('companion_id')->constrained('users')->onDelete('cascade');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -102,6 +115,13 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::dropIfExists('companions');
+
+        Schema::table('teams', function (Blueprint $table) {
+            $table->dropForeign(['teams_leader_id_foreign']);
+            $table->dropColumn('leader_id');
+        });
+
         Schema::dropIfExists('answers');
         Schema::dropIfExists('form_submissions');
         Schema::dropIfExists('questions');

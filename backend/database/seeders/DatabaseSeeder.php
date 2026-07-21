@@ -82,41 +82,100 @@ class DatabaseSeeder extends Seeder
                 'name' => 'Admin Patriot',
                 'email' => 'admin@patriot.com',
                 'password' => Hash::make('password'),
+                'role' => 'ADMIN',
                 'role_id' => $admin->id,
                 'team_id' => null,
+                'tanggal_lahir' => '1985-05-12',
+                'participant_id' => 'ADM-001',
             ],
             [
                 'name' => 'Dr. Jane Smith',
                 'email' => 'dokter@patriot.com',
                 'password' => Hash::make('password'),
+                'role' => 'DOKTER',
                 'role_id' => $dokter->id,
                 'team_id' => null,
+                'tanggal_lahir' => '1979-11-20',
+                'participant_id' => 'DOC-002',
             ],
             [
                 'name' => 'Budi Santoso',
                 'email' => 'peserta@patriot.com',
                 'password' => Hash::make('password'),
+                'role' => 'PESERTA',
                 'role_id' => $peserta->id,
                 'team_id' => $team1->id,
+                'tanggal_lahir' => '1998-03-15',
+                'participant_id' => 'PT-2026-003',
             ],
             [
                 'name' => 'Ani Lestari',
                 'email' => 'ani@patriot.com',
                 'password' => Hash::make('password'),
+                'role' => 'PESERTA',
                 'role_id' => $peserta->id,
                 'team_id' => $team1->id, // Same team, makes her a potential companion for Budi
+                'tanggal_lahir' => '2000-07-22',
+                'participant_id' => 'PT-2026-004',
             ],
             [
                 'name' => 'Yusuf Mansur',
                 'email' => 'yusuf@patriot.com',
                 'password' => Hash::make('password'),
+                'role' => 'PESERTA', // Default to PESERTA in enum column, dynamic role will resolve via accessor
                 'role_id' => $pjTim->id,
                 'team_id' => $team1->id,
+                'tanggal_lahir' => '1990-09-09',
+                'participant_id' => 'PT-2026-005',
+            ],
+            [
+                'name' => 'Tim Kesehatan Patriot',
+                'email' => 'timkes@patriot.com',
+                'password' => Hash::make('password'),
+                'role_id' => $timKes->id,
+                'team_id' => null,
+                'tanggal_lahir' => '1988-12-12',
+                'participant_id' => 'TK-006',
+            ],
+            [
+                'name' => 'Petugas Kesehatan Patriot',
+                'email' => 'petugas@patriot.com',
+                'password' => Hash::make('password'),
+                'role_id' => $petugasKes->id,
+                'team_id' => $team1->id,
+                'tanggal_lahir' => '1992-06-06',
+                'participant_id' => 'PK-007',
+            ],
+            [
+                'name' => 'Teman Pendamping Patriot',
+                'email' => 'pendamping@patriot.com',
+                'password' => Hash::make('password'),
+                'role_id' => $temanPendamping->id,
+                'team_id' => $team1->id,
+                'tanggal_lahir' => '1995-08-08',
+                'participant_id' => 'PD-008',
             ],
         ];
 
         foreach ($usersData as $userData) {
             User::updateOrCreate(['email' => $userData['email']], $userData);
+        }
+
+        // Assign Leader (Coordinator) to Team 1
+        $yusuf = User::where('email', 'yusuf@patriot.com')->first();
+        if ($yusuf && $team1) {
+            $team1->update(['leader_id' => $yusuf->id]);
+        }
+
+        // Establish Companionship (Pertemanan) within Team 1
+        $budi = User::where('email', 'peserta@patriot.com')->first();
+        $ani = User::where('email', 'ani@patriot.com')->first();
+        $pendamping = User::where('email', 'pendamping@patriot.com')->first();
+        
+        if ($budi && $ani && $pendamping) {
+            $budi->companions()->sync([$ani->id, $pendamping->id]);
+            $ani->companions()->sync([$budi->id, $pendamping->id]);
+            $pendamping->companions()->sync([$budi->id, $ani->id]);
         }
 
         // 6. Seed Forms (Form 1 to Form 6)
@@ -125,7 +184,7 @@ class DatabaseSeeder extends Seeder
 
     private function seedForms(): void
     {
-        $dokterUser = User::whereHas('role', function($q) { $q->where('name', 'DOKTER'); })->first();
+        $dokterUser = User::whereHas('roleRelation', function($q) { $q->where('name', 'DOKTER'); })->first();
         $createdById = $dokterUser ? $dokterUser->id : null;
 
         // FORM 1: Profil Awal

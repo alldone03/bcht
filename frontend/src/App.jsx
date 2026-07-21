@@ -42,15 +42,31 @@ function DashboardWrapper({ currentUser, activeTab, setActiveTab }) {
 export default function App() {
   const [currentUser, setCurrentUser] = useState(api.getCurrentUser());
   const [activeTab, setActiveTab] = useState('overview');
+  const [toast, setToast] = useState(null); // { message, type }
+
+  useEffect(() => {
+    window.toast = (message, type = 'info') => {
+      setToast({ message, type });
+      setTimeout(() => {
+        setToast(null);
+      }, 3000);
+    };
+
+    window.alert = (message) => {
+      const type = /berhasil|sukses|saved|success|diterbitkan/i.test(message) ? 'success' : 
+                   /gagal|error|salah|forbidden|unauthorized|tidak boleh/i.test(message) ? 'error' : 'info';
+      window.toast(message, type);
+    };
+  }, []);
 
   useEffect(() => {
     if (currentUser) {
       if (currentUser.role === 'ADMIN') {
         setActiveTab('overview');
       } else if (currentUser.role === 'DOKTER') {
-        setActiveTab('mews-submissions');
+        setActiveTab('forms-responses');
       } else {
-        setActiveTab('mews');
+        setActiveTab('forms-list');
       }
     }
   }, [currentUser]);
@@ -66,7 +82,18 @@ export default function App() {
 
   return (
     <BrowserRouter basename={import.meta.env.BASE_URL}>
-      <div className="min-h-screen bg-base-300/40 text-neutral">
+      <div className="min-h-screen bg-base-300/40 text-neutral relative">
+        {toast && (
+          <div className="toast toast-top toast-end z-50 mt-16 mr-4 animate-bounce">
+            <div className={`alert ${
+              toast.type === 'success' ? 'alert-success text-success-content' : 
+              toast.type === 'error' ? 'alert-error text-error-content' : 
+              'alert-info text-info-content'
+            } shadow-2xl rounded-2xl border-none font-semibold text-xs py-3.5 px-5 flex items-center gap-2`}>
+              <span>{toast.message}</span>
+            </div>
+          </div>
+        )}
         <Navbar 
           currentUser={currentUser} 
           onLogout={handleLogout} 

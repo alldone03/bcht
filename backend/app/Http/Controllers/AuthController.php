@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Role;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
@@ -14,14 +15,22 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:6',
-            'role' => 'required|in:ADMIN,DOKTER,PESERTA',
+            'role' => 'nullable|string|in:ADMIN,DOKTER,PESERTA',
+            'tanggal_lahir' => 'nullable|date',
+            'participant_id' => 'nullable|string|max:255',
         ]);
+
+        $roleName = $request->role ?: 'PESERTA';
+        $roleModel = Role::where('name', $roleName)->first();
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
-            'role' => $request->role,
+            'role' => $roleName,
+            'role_id' => $roleModel ? $roleModel->id : null,
+            'tanggal_lahir' => $request->tanggal_lahir,
+            'participant_id' => $request->participant_id,
         ]);
 
         return response()->json([
@@ -30,6 +39,8 @@ class AuthController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'role' => $user->role,
+                'tanggal_lahir' => $user->tanggal_lahir,
+                'participant_id' => $user->participant_id,
             ],
             'token' => $user->createToken('auth_token')->plainTextToken
         ]);
@@ -54,6 +65,8 @@ class AuthController extends Controller
                 'name' => $user->name,
                 'email' => $user->email,
                 'role' => $user->role,
+                'tanggal_lahir' => $user->tanggal_lahir,
+                'participant_id' => $user->participant_id,
             ],
             'token' => $user->createToken('auth_token')->plainTextToken
         ]);

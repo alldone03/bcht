@@ -1,4 +1,4 @@
-# PATRIOT HEALTH DEPLOYMENT GUIDE
+# PATRIOT ITS DEPLOYMENT GUIDE
 
 Ikuti langkah-langkah di bawah ini untuk mendeploy aplikasi menggunakan Docker Compose di lingkungan produksi:
 
@@ -13,11 +13,8 @@ Ikuti langkah-langkah di bawah ini untuk mendeploy aplikasi menggunakan Docker C
 3. Jalankan migrasi database di kontainer backend secara paksa:
    docker compose -f docker-compose.prod.yml exec backend php artisan migrate --force
 
-4. Lakukan seeding untuk parameter instrumen M-EWS bawaan:
-   docker compose -f docker-compose.prod.yml exec backend php artisan db:seed --class=MewsSeeder --force
-
-5. Periksa status kontainer yang sedang berjalan:
+4. Periksa status kontainer yang sedang berjalan:
    docker compose -f docker-compose.prod.yml ps
 
-6. Pantau log antrean pesan (Queue Worker) secara real-time:
+5. Pantau log antrean pesan (Queue Worker) secara real-time:
    docker compose -f docker-compose.prod.yml logs -f queue-worker

@@ -23,6 +23,8 @@ export default function FormFiller({ formId, onBack, onSubmitted }) {
   
   // Answers state: { [question_id]: value }
   const [answers, setAnswers] = useState({});
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filteredUsers, setFilteredUsers] = useState([]);
 
   useEffect(() => {
     const user = api.getCurrentUser();
@@ -33,6 +35,37 @@ export default function FormFiller({ formId, onBack, onSubmitted }) {
     }
     fetchFormDetails();
   }, [formId]);
+
+  useEffect(() => {
+    if (!targetUserId || !form?.questions) return;
+    const selectedUser = teamMembers.find(u => u.id === Number(targetUserId)) || (currentUser?.id === Number(targetUserId) ? currentUser : null);
+    if (!selectedUser) return;
+
+    setAnswers(prev => {
+      const updated = { ...prev };
+      let updatedCount = 0;
+      form.questions.forEach(q => {
+        const text = q.text.toLowerCase();
+        if (text.includes('nama lengkap') && selectedUser.name) {
+          if (updated[q.id] !== selectedUser.name) {
+            updated[q.id] = selectedUser.name;
+            updatedCount++;
+          }
+        } else if ((text.includes('id peserta') || text.includes('id')) && selectedUser.participant_id) {
+          if (updated[q.id] !== selectedUser.participant_id) {
+            updated[q.id] = selectedUser.participant_id;
+            updatedCount++;
+          }
+        } else if ((text.includes('tanggal lahir') || text.includes('lahir')) && selectedUser.tanggal_lahir) {
+          if (updated[q.id] !== selectedUser.tanggal_lahir) {
+            updated[q.id] = selectedUser.tanggal_lahir;
+            updatedCount++;
+          }
+        }
+      });
+      return updatedCount > 0 ? updated : prev;
+    });
+  }, [targetUserId, teamMembers, form, currentUser]);
 
   const fetchFormDetails = async () => {
     setLoading(true);
@@ -226,33 +259,79 @@ export default function FormFiller({ formId, onBack, onSubmitted }) {
 
         <form onSubmit={handleSubmit} className="p-6 sm:p-8 space-y-8">
           {/* Target Participant Selector */}
-          <div className="card bg-base-50 border border-base-200 p-4 rounded-2xl flex flex-col sm:flex-row gap-4 items-center">
-            <div className="avatar placeholder">
-              <div className="bg-primary/20 text-primary rounded-xl w-12 h-12">
-                <User className="w-6 h-6" />
+          <div className="card bg-base-50 border border-base-200 p-5 rounded-2xl flex flex-col md:flex-row gap-5 items-stretch md:items-center">
+            <div className="flex gap-4 items-center">
+              <div className="avatar placeholder">
+                <div className="bg-primary/20 text-primary rounded-xl w-12 h-12 flex items-center justify-center shrink-0">
+                  <User className="w-6 h-6" />
+                </div>
+              </div>
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-neutral-600 block">Formulir diisi untuk:</label>
+                {currentUser && (currentUser.role === 'PESERTA' && teamMembers.length <= 1) ? (
+                  <div className="text-sm font-bold text-neutral">{currentUser.name} (Diri Sendiri)</div>
+                ) : (
+                  <select 
+                    value={targetUserId} 
+                    onChange={(e) => setTargetUserId(e.target.value)} 
+                    className="select select-bordered select-sm rounded-lg w-full max-w-xs font-semibold text-xs"
+                  >
+                    <option value={currentUser?.id}>Diri Sendiri ({currentUser?.name})</option>
+                    {teamMembers
+                      .filter(m => m.id !== currentUser?.id)
+                      .map(m => (
+                        <option key={m.id} value={m.id}>
+                          {m.name} ({m.participant_id || 'Anggota Tim'})
+                        </option>
+                      ))}
+                  </select>
+                )}
               </div>
             </div>
-            <div className="flex-1 w-full space-y-1">
-              <label className="text-xs font-bold text-neutral-600 block">Formulir diisi untuk:</label>
-              {currentUser && (currentUser.role === 'PESERTA' && teamMembers.length <= 1) ? (
-                <div className="text-sm font-bold text-neutral">{currentUser.name} (Diri Sendiri)</div>
-              ) : (
-                <select 
-                  value={targetUserId} 
-                  onChange={(e) => setTargetUserId(e.target.value)} 
-                  className="select select-bordered select-sm rounded-lg w-full max-w-xs font-semibold text-xs"
-                >
-                  <option value={currentUser?.id}>Diri Sendiri ({currentUser?.name})</option>
-                  {teamMembers
-                    .filter(m => m.id !== currentUser?.id)
-                    .map(m => (
-                      <option key={m.id} value={m.id}>
-                        {m.name} (Anggota Tim)
-                      </option>
+
+            {/* Live Search & Auto-Fill tool */}
+            {!(currentUser && (currentUser.role === 'PESERTA' && teamMembers.length <= 1)) && (
+              <div className="flex-1 relative">
+                <label className="text-xs font-bold text-neutral-600 block mb-1">Cari Peserta (Auto-Fill data profil):</label>
+                <input
+                  type="text"
+                  placeholder="Ketik nama atau ID peserta..."
+                  className="input input-bordered input-sm rounded-xl w-full text-xs"
+                  value={searchQuery}
+                  onChange={(e) => {
+                    const q = e.target.value;
+                    setSearchQuery(q);
+                    if (q.trim()) {
+                      const matched = teamMembers.filter(u => 
+                        u.name.toLowerCase().includes(q.toLowerCase()) || 
+                        (u.participant_id && u.participant_id.toLowerCase().includes(q.toLowerCase()))
+                      );
+                      setFilteredUsers(matched);
+                    } else {
+                      setFilteredUsers([]);
+                    }
+                  }}
+                />
+                {filteredUsers.length > 0 && (
+                  <div className="absolute left-0 right-0 bg-base-100 border rounded-xl shadow-2xl mt-1.5 z-10 max-h-48 overflow-y-auto p-1 divide-y border-base-200">
+                    {filteredUsers.map(u => (
+                      <div
+                        key={u.id}
+                        onClick={() => {
+                          setTargetUserId(u.id);
+                          setSearchQuery('');
+                          setFilteredUsers([]);
+                        }}
+                        className="p-2.5 hover:bg-primary hover:text-white rounded-lg cursor-pointer text-xs font-semibold flex justify-between transition-colors"
+                      >
+                        <span>{u.name}</span>
+                        <span className="font-mono opacity-80 text-[10px]">{u.participant_id || u.email}</span>
+                      </div>
                     ))}
-                </select>
-              )}
-            </div>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Render Dynamic Questions */}

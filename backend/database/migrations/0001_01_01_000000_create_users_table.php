@@ -18,6 +18,8 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->enum('role', ['ADMIN', 'DOKTER', 'PESERTA'])->default('PESERTA');
+            $table->date('tanggal_lahir')->nullable();
+            $table->string('participant_id')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

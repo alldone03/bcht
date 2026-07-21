@@ -18,7 +18,7 @@ export default function Navbar({ currentUser, onLogout }) {
             <Stethoscope className="w-6 h-6" />
           </div>
           <span className="font-heading font-extrabold text-xl tracking-tight bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-            Patriot Health
+            Patriot ITS
           </span>
         </a>
       </div>

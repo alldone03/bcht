@@ -1,14 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
-import MewsBuilder from './MewsBuilder';
+import React, { useEffect, useState } from 'react';
 import FormBuilder from './FormBuilder';
 import FormResponsesList from './FormResponsesList';
+import FormsList from './FormsList';
 import { api } from '../api';
-import { 
-  ClipboardList, 
-  FilePlus, 
-  MessageSquare, 
-  CheckCircle, 
-  AlertCircle, 
+import {
+  ClipboardList,
+  FilePlus,
+  MessageSquare,
+  CheckCircle,
+  AlertCircle,
   Send,
   X,
   ShieldCheck,
@@ -21,252 +21,44 @@ import {
 } from 'lucide-react';
 
 export default function DokterDashboard({ user, activeTab, setActiveTab }) {
-  const [mewsSubmissions, setMewsSubmissions] = useState([]);
-  const [mewsLoading, setMewsLoading] = useState(false);
-  const [selectedResult, setSelectedResult] = useState(null);
-  const [adviceText, setAdviceText] = useState('');
-  const [submittingAdvice, setSubmittingAdvice] = useState(false);
-
-  const isFetchingMews = useRef(false);
-
-  useEffect(() => {
-    if (activeTab === 'mews-submissions') {
-      fetchMewsSubmissions();
-    }
-  }, [activeTab]);
-
-  const fetchMewsSubmissions = async () => {
-    if (isFetchingMews.current) return;
-    isFetchingMews.current = true;
-    setMewsLoading(true);
-    try {
-      const data = await api.mewsGetAllResults();
-      setMewsSubmissions(data);
-    } catch (e) {
-      console.error("Gagal mengambil submissions M-EWS", e);
-    } finally {
-      setMewsLoading(false);
-      isFetchingMews.current = false;
-    }
-  };
-
-  const handleOpenReview = (sub) => {
-    setSelectedResult(sub);
-    setAdviceText(sub.doctor_notes || '');
-  };
-
-  const handleCloseReview = () => {
-    setSelectedResult(null);
-    setAdviceText('');
-  };
-
-  const handleSubmitAdvice = async () => {
-    if (!adviceText.trim()) {
-      alert("Saran klinis dokter tidak boleh kosong!");
-      return;
-    }
-
-    setSubmittingAdvice(true);
-    try {
-      // If we don't have result_id directly, fallback to session_id
-      const id = selectedResult.result_id || selectedResult.session_id;
-      await api.mewsApproveResult(id, adviceText);
-      alert("Hasil screening berhasil divalidasi dan saran telah dikirim ke pasien!");
-      handleCloseReview();
-      fetchMewsSubmissions();
-    } catch (e) {
-      alert("Gagal memberikan ulasan: " + e.message);
-    } finally {
-      setSubmittingAdvice(false);
-    }
-  };
-
   return (
     <div className="space-y-6">
       {/* Mobile Tab Nav */}
       <div className="tabs tabs-boxed md:hidden bg-base-100 p-2 shadow rounded-xl flex-wrap">
-        <a 
-          className={`tab ${activeTab === 'mews-submissions' ? 'tab-active' : ''}`}
-          onClick={() => setActiveTab('mews-submissions')}
+        <a
+          className={`tab ${activeTab === 'forms-responses' ? 'tab-active' : ''}`}
+          onClick={() => setActiveTab('forms-responses')}
         >
-          Hasil M-EWS
+          Respon Form
         </a>
-        <a 
-          className={`tab ${activeTab === 'mews-builder' ? 'tab-active' : ''}`}
-          onClick={() => setActiveTab('mews-builder')}
+        <a
+          className={`tab ${activeTab === 'forms-builder' ? 'tab-active' : ''}`}
+          onClick={() => setActiveTab('forms-builder')}
         >
-          Builder M-EWS
+          Form Builder
         </a>
-        <a 
-          className={`tab ${activeTab === 'mews-chats' ? 'tab-active' : ''}`}
-          onClick={() => setActiveTab('mews-chats')}
+        <a
+          className={`tab ${activeTab === 'forms-list' ? 'tab-active' : ''}`}
+          onClick={() => setActiveTab('forms-list')}
+        >
+          Isi Formulir
+        </a>
+        <a
+          className={`tab ${activeTab === 'supervisi-chat' ? 'tab-active' : ''}`}
+          onClick={() => setActiveTab('supervisi-chat')}
         >
           Supervisi Chat
         </a>
       </div>
 
-      {activeTab === 'mews-builder' ? (
-        <div>
-          <MewsBuilder doctorId={user.id} onTemplateSaved={() => setActiveTab('mews-submissions')} />
-        </div>
-      ) : activeTab === 'forms-builder' ? (
-        <FormBuilder onBack={() => setActiveTab('mews-submissions')} />
-      ) : activeTab === 'forms-responses' ? (
-        <FormResponsesList />
-      ) : activeTab === 'mews-chats' ? (
+      {activeTab === 'forms-builder' ? (
+        <FormBuilder onBack={() => setActiveTab('forms-responses')} />
+      ) : activeTab === 'forms-list' ? (
+        <FormsList user={user} setActiveTab={setActiveTab} />
+      ) : activeTab === 'supervisi-chat' ? (
         <ChatSupervisionView />
       ) : (
-        <div className="space-y-6">
-          <div>
-            <h1 className="text-3xl font-heading font-black text-neutral">Hasil Screening M-EWS</h1>
-            <p className="text-sm text-neutral-500 mt-1">Daftar lengkap hasil skrining klinis parameter M-EWS dari seluruh pasien.</p>
-          </div>
-
-          <div className="card bg-base-100 shadow-xl border border-base-200 p-6 rounded-3xl">
-            {mewsLoading ? (
-              <div className="text-center py-12">
-                <span className="loading loading-spinner text-primary" />
-                <p className="text-xs text-neutral-500 mt-2">Memuat data...</p>
-              </div>
-            ) : mewsSubmissions.length === 0 ? (
-              <div className="text-center py-12 text-neutral-500 text-sm">
-                Belum ada pasien yang melakukan screening M-EWS.
-              </div>
-            ) : (
-              <div className="overflow-x-auto w-full">
-                <table className="table w-full">
-                  <thead>
-                    <tr>
-                      <th>Pasien</th>
-                      <th>Template</th>
-                      <th>Skor Total</th>
-                      <th>Klasifikasi</th>
-                      <th>Status Verifikasi</th>
-                      <th>Rincian Review</th>
-                      <th>Tanggal</th>
-                      <th>Aksi</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {mewsSubmissions.map((sub, idx) => (
-                      <tr key={idx} className="hover">
-                        <td>
-                          <div className="font-bold text-xs text-neutral">{sub.participant_name}</div>
-                        </td>
-                        <td>
-                          <div className="text-xs text-neutral-500">{sub.template_name}</div>
-                        </td>
-                        <td>
-                          <div className="flex flex-col gap-0.5">
-                            <span className="font-bold font-mono text-xs text-neutral">Total: {sub.total_score}</span>
-                            <span className="text-[10px] text-neutral-400">Max: {sub.highest_score}</span>
-                          </div>
-                        </td>
-                        <td>
-                          <span className={`badge badge-sm font-extrabold uppercase px-2 py-0.5 rounded ${
-                            sub.classification === 'RED' ? 'bg-red-500/10 text-red-500 border border-red-500/20' : sub.classification === 'YELLOW' ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/20' : 'bg-green-500/10 text-green-500 border border-green-500/20'
-                          }`}>
-                            {sub.classification}
-                          </span>
-                        </td>
-                        <td>
-                          {sub.status === 'APPROVED' ? (
-                            <span className="flex items-center gap-1 text-green-600 font-bold text-xs">
-                              <ShieldCheck className="w-4 h-4 shrink-0" /> Diverifikasi
-                            </span>
-                          ) : (
-                            <span className="flex items-center gap-1 text-neutral-400 font-bold text-xs">
-                              <Clock className="w-4 h-4 shrink-0" /> Tertunda
-                            </span>
-                          )}
-                        </td>
-                        <td className="max-w-[200px] truncate text-xs text-neutral-500">
-                          {sub.status === 'APPROVED' ? (
-                            <div>
-                              <div className="font-bold text-neutral-700">Dr. {sub.doctor_name}</div>
-                              <div className="italic text-[10px] truncate">{sub.doctor_notes}</div>
-                            </div>
-                          ) : (
-                            <span className="text-neutral-400 font-normal">Belum ada saran</span>
-                          )}
-                        </td>
-                        <td className="text-xs text-neutral-400">
-                          {new Date(sub.finished_at).toLocaleString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
-                        </td>
-                        <td>
-                          <button 
-                            onClick={() => handleOpenReview(sub)}
-                            className="btn btn-primary btn-xs rounded-xl font-bold flex items-center gap-1"
-                          >
-                            {sub.status === 'APPROVED' ? 'Edit Saran' : 'Beri Saran'}
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
-
-      {/* Review Modal Dialog */}
-      {selectedResult && (
-        <div className="modal modal-open">
-          <div className="modal-box rounded-3xl max-w-xl p-6 relative">
-            <button 
-              onClick={handleCloseReview}
-              className="btn btn-sm btn-circle btn-ghost absolute right-4 top-4"
-            >
-              <X className="w-4 h-4" />
-            </button>
-            <h3 className="font-heading font-black text-lg text-neutral mb-2">Validasi & Rekomendasi Medis</h3>
-            <p className="text-xs text-neutral-500 mb-4">
-              Berikan saran klinis untuk pasien <strong>{selectedResult.participant_name}</strong> berdasarkan hasil M-EWS dengan klasifikasi <strong>{selectedResult.classification}</strong> (Skor: {selectedResult.total_score}).
-            </p>
-
-            <div className="bg-base-200/60 border border-base-200 p-4 rounded-2xl mb-4 space-y-2 text-xs">
-              <div className="flex justify-between">
-                <span className="font-semibold text-neutral-500">Klasifikasi M-EWS:</span>
-                <span className="font-black text-neutral">{selectedResult.classification}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="font-semibold text-neutral-500">Rekomendasi Awal:</span>
-                <span className="font-medium text-neutral">{selectedResult.recommendation}</span>
-              </div>
-            </div>
-
-            <div className="form-control mb-5">
-              <label className="label"><span className="label-text font-bold text-xs">Saran / Catatan Khusus Dokter</span></label>
-              <textarea 
-                rows="4"
-                value={adviceText}
-                onChange={(e) => setAdviceText(e.target.value)}
-                className="textarea textarea-bordered rounded-2xl text-xs w-full focus:outline-none"
-                placeholder="Tulis instruksi observasi, saran obat, atau langkah rujukan selanjutnya..."
-                required
-              />
-            </div>
-
-            <div className="modal-action">
-              <button 
-                onClick={handleCloseReview}
-                className="btn btn-ghost rounded-xl btn-sm"
-              >
-                Batal
-              </button>
-              <button 
-                onClick={handleSubmitAdvice}
-                disabled={submittingAdvice}
-                className="btn btn-primary rounded-xl btn-sm font-bold flex items-center gap-1 px-4"
-              >
-                {submittingAdvice ? <span className="loading loading-spinner loading-xs" /> : <Send className="w-3.5 h-3.5" />}
-                Kirim Validasi
-              </button>
-            </div>
-          </div>
-        </div>
+        <FormResponsesList />
       )}
     </div>
   );
@@ -280,7 +72,7 @@ function ChatSupervisionView() {
   const [loadingSessions, setLoadingSessions] = useState(false);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [socketConnected, setSocketConnected] = useState(false);
-  
+
   // Modals / Input state
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedPatientId, setSelectedPatientId] = useState('');
@@ -338,7 +130,7 @@ function ChatSupervisionView() {
         try {
           const payload = JSON.parse(event.data);
           const { event: wsEvent, data } = payload;
-          
+
           if (wsEvent === 'message_created') {
             setMessages(prev => {
               if (prev.some(m => m.id === data.id)) return prev;
@@ -475,219 +267,31 @@ function ChatSupervisionView() {
   };
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-3xl font-heading font-black text-neutral">Supervisi Chatbot AI Pasien</h1>
-          <p className="text-sm text-neutral-500 mt-1">Supervisi & kelola riwayat konsultasi medis antara pasien dan Patriot AI.</p>
-        </div>
-        <button 
-          onClick={() => setShowCreateModal(true)}
-          className="btn btn-primary rounded-xl btn-sm font-bold flex items-center gap-1.5 px-4"
-        >
-          <Plus className="w-4 h-4" />
-          Mulai Diskusi
-        </button>
-      </div>
+    <div className="card bg-base-100 shadow-xl border border-base-200 p-8 flex flex-col items-center justify-center text-center min-h-[400px] h-[calc(100vh-10rem)] max-h-[600px] relative overflow-hidden">
+      {/* Background soft glowing blur */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-primary/10 rounded-full blur-3xl" />
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 h-[calc(100vh-14rem)] max-h-[600px]">
-        {/* Left Side: Sessions list */}
-        <div className="md:col-span-1 bg-base-100 rounded-2xl shadow-xl border border-base-200 p-4 flex flex-col justify-between overflow-y-auto">
-          <div className="space-y-4">
-            <h3 className="font-heading font-bold text-sm text-neutral">Daftar Sesi Diskusi</h3>
-            {loadingSessions ? (
-              <div className="flex justify-center py-8"><span className="loading loading-spinner text-primary" /></div>
-            ) : (
-              <div className="space-y-2">
-                {sessions.map((sess) => (
-                  <div 
-                    key={sess.id}
-                    onClick={() => handleSelectSession(sess)}
-                    className={`p-3 rounded-xl cursor-pointer transition-all border text-xs flex justify-between items-center ${
-                      selectedSession?.id === sess.id
-                        ? 'bg-primary text-primary-content border-primary font-bold shadow-md shadow-primary/20'
-                        : 'bg-base-200 hover:bg-base-300 text-neutral border-transparent'
-                    }`}
-                  >
-                    <div className="truncate mr-2 flex-1">
-                      <div className="font-bold truncate">{sess.participant_name}</div>
-                      <div className="text-[10px] opacity-80 truncate">{sess.title}</div>
-                      <div className="text-[9px] opacity-60 mt-1">
-                        {new Date(sess.started_at).toLocaleDateString('id-ID', { hour: '2-digit', minute: '2-digit' })}
-                      </div>
-                    </div>
-                    <button 
-                      onClick={(e) => handleDeleteSession(e, sess.id)}
-                      className="hover:scale-110 text-error-content hover:text-red-500 p-1 rounded"
-                      title="Hapus Sesi"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-                ))}
-                {sessions.length === 0 && (
-                  <p className="text-xs text-neutral-500 text-center py-8">Belum ada sesi diskusi dari pasien.</p>
-                )}
-              </div>
-            )}
-          </div>
+      <div className="relative space-y-6 max-w-md">
+        <div className="w-20 h-20 bg-warning/10 text-warning rounded-full flex items-center justify-center mx-auto border border-warning/20 shadow-lg shadow-warning/5 animate-pulse">
+          <MessageSquare className="w-10 h-10" />
         </div>
 
-        {/* Right Side: Conversation stream */}
-        <div className="md:col-span-3 bg-base-100 rounded-2xl shadow-xl border border-base-200 flex flex-col justify-between overflow-hidden">
-          {selectedSession ? (
-            <>
-              <div className="p-4 border-b border-base-200 bg-base-200/30 flex items-center justify-between">
-                <div>
-                  <h4 className="font-bold text-xs text-neutral">
-                    Supervisi: {selectedSession.participant_name}
-                  </h4>
-                  <p className="text-[9px] text-neutral-500 uppercase tracking-wider font-bold">
-                    Model: {selectedSession.llm_model}
-                  </p>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1.5 bg-base-200/50 px-2 py-0.5 rounded-xl border border-base-200/60">
-                    <span className={`w-1.5 h-1.5 rounded-full ${socketConnected ? 'bg-green-500' : 'bg-yellow-500 animate-pulse'}`} />
-                    <span className="text-[8px] font-bold text-neutral-600">
-                      Real-time: {socketConnected ? 'AKTIF' : 'OFFLINE'}
-                    </span>
-                  </div>
-                  <div className="badge badge-accent font-bold text-[9px] uppercase">
-                    Supervised Active CRUD View
-                  </div>
-                </div>
-              </div>
+        <div className="space-y-2">
+          <h2 className="text-2xl font-heading font-black text-neutral">Supervisi Chat Sedang Pemeliharaan</h2>
+          <p className="text-xs text-neutral-500 leading-relaxed">
+            Fitur supervisi chatbot AI pasien saat ini sedang menjalani pemeliharaan berkala untuk peningkatan performa dan sinkronisasi data klinis. Kami akan segera kembali online.
+          </p>
+        </div>
 
-              <div className="flex-1 p-4 overflow-y-auto space-y-4 max-h-[400px]">
-                {loadingMessages ? (
-                  <div className="flex justify-center py-12"><span className="loading loading-spinner text-primary" /></div>
-                ) : (
-                  messages.map((msg) => {
-                    const isDoctor = msg.role === 'DOCTOR';
-                    const isUser = msg.role === 'USER';
-                    
-                    let chatStyle = "chat-start";
-                    let bubbleColor = "bg-base-200 text-neutral";
-                    let senderLabel = "AI";
+        <div className="badge badge-warning gap-1.5 py-3 px-4 rounded-xl font-bold text-[10px] tracking-wider uppercase text-warning-content">
+          <span className="w-1.5 h-1.5 rounded-full bg-warning-content animate-ping" />
+          Status: Under Maintenance
+        </div>
 
-                    if (isUser) {
-                      chatStyle = "chat-end";
-                      bubbleColor = "bg-primary text-primary-content";
-                      senderLabel = "U";
-                    } else if (isDoctor) {
-                      chatStyle = "chat-end";
-                      bubbleColor = "bg-success text-success-content font-medium";
-                      senderLabel = "Dr";
-                    }
-
-                    return (
-                      <div key={msg.id} className={`chat ${chatStyle} group`}>
-                        <div className="chat-image avatar placeholder">
-                          <div className="w-8 rounded-full bg-neutral text-neutral-content flex items-center justify-center text-[10px] font-bold">
-                            {senderLabel}
-                          </div>
-                        </div>
-                        <div className={`chat-bubble text-xs leading-relaxed relative max-w-[85%] pr-8 ${bubbleColor}`}>
-                          {editingMsgId === msg.id ? (
-                            <div className="flex flex-col gap-2 p-1">
-                              <textarea 
-                                value={editingText}
-                                onChange={(e) => setEditingText(e.target.value)}
-                                className="textarea textarea-bordered text-xs focus:outline-none w-full text-neutral bg-base-100"
-                                rows="2"
-                              />
-                              <div className="flex justify-end gap-2">
-                                <button onClick={() => setEditingMsgId(null)} className="btn btn-ghost btn-xs">Batal</button>
-                                <button onClick={() => handleUpdateMessage(msg.id)} className="btn btn-primary btn-xs">Simpan</button>
-                              </div>
-                            </div>
-                          ) : (
-                            <>
-                              <div>{msg.message}</div>
-                              {/* Edit & Delete operations */}
-                              <div className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 transition-all flex gap-1.5 bg-base-100/10 p-0.5 rounded shadow">
-                                <button 
-                                  onClick={() => startEdit(msg)} 
-                                  className="hover:scale-115 text-neutral-content/75 hover:text-primary transition-all"
-                                  title="Edit Pesan"
-                                >
-                                  <Edit2 className="w-3 h-3" />
-                                </button>
-                                <button 
-                                  onClick={() => handleDeleteMessage(msg.id)} 
-                                  className="hover:scale-115 text-neutral-content/75 hover:text-red-500 transition-all"
-                                  title="Hapus Pesan"
-                                >
-                                  <Trash2 className="w-3 h-3" />
-                                </button>
-                              </div>
-                            </>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-
-              {/* Reply Input Form */}
-              <form onSubmit={handleSendMessage} className="p-4 border-t border-base-200 bg-base-200/20 flex gap-2">
-                <input 
-                  type="text" 
-                  placeholder="Ketik ulasan dokter, koreksi, atau saran Anda..." 
-                  className="input input-bordered flex-1 rounded-xl text-xs"
-                  value={replyText}
-                  onChange={(e) => setReplyText(e.target.value)}
-                />
-                <button 
-                  type="submit" 
-                  className="btn btn-primary rounded-xl btn-sm h-10 px-4"
-                >
-                  <Send className="w-4 h-4" />
-                </button>
-              </form>
-            </>
-          ) : (
-            <div className="flex-1 flex flex-col items-center justify-center text-center p-8 text-neutral-500">
-              <Bot className="w-12 h-12 text-primary mb-3" />
-              <h4 className="font-heading font-bold text-sm text-neutral">Supervisi Chatbot AI Pasien</h4>
-              <p className="text-xs max-w-sm mt-1">
-                Pilih salah satu sesi diskusi medis pasien di menu sebelah kiri untuk mengelola log percakapan.
-              </p>
-            </div>
-          )}
+        <div className="pt-4 border-t border-base-200 text-[10px] text-neutral-400">
+          Layanan monitoring medis dan respon form tetap berjalan normal.
         </div>
       </div>
-
-      {/* Create Session Modal */}
-      {showCreateModal && (
-        <div className="modal modal-open">
-          <div className="modal-box rounded-3xl border border-base-200 shadow-2xl">
-            <h3 className="font-bold text-lg text-neutral">Mulai Sesi Diskusi Baru</h3>
-            <p className="py-2 text-xs text-neutral-500">Pilih pasien untuk memulai sesi konsultasi medis tersupervisi.</p>
-            
-            <div className="form-control w-full my-4">
-              <label className="label"><span className="label-text text-xs font-bold">Pilih Pasien</span></label>
-              <select 
-                value={selectedPatientId} 
-                onChange={(e) => setSelectedPatientId(e.target.value)}
-                className="select select-bordered rounded-2xl text-xs w-full focus:outline-none"
-              >
-                <option value="">-- Pilih Pasien --</option>
-                {patients.map(p => (
-                  <option key={p.id} value={p.id}>{p.name} ({p.email})</option>
-                ))}
-              </select>
-            </div>
-
-            <div className="modal-action">
-              <button onClick={() => { setShowCreateModal(false); setSelectedPatientId(''); }} className="btn btn-ghost rounded-xl btn-sm">Batal</button>
-              <button onClick={handleCreateSession} className="btn btn-primary rounded-xl btn-sm font-bold">Mulai Diskusi</button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
   );
 }

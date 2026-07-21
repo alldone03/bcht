@@ -28,7 +28,7 @@ export default function LandingPage() {
                 </span> Anda
               </h1>
               <p className="text-base md:text-lg text-neutral-500 mb-8 leading-relaxed">
-                Patriot Health memfasilitasi deteksi dini kesehatan klinis menggunakan sistem screening valid, dipantau langsung oleh dokter ahli, serta didukung chatbot pintar AI yang siap mendampingi Anda 24/7.
+                Patriot ITS memfasilitasi deteksi dini kesehatan klinis menggunakan sistem screening valid, dipantau langsung oleh dokter ahli, serta didukung chatbot pintar AI yang siap mendampingi Anda 24/7.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 sm:justify-center lg:justify-start">
                 <button
@@ -70,7 +70,7 @@ export default function LandingPage() {
       <div className="py-20 bg-base-100">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <h2 className="text-3xl md:text-4xl font-heading font-extrabold text-neutral">Mengapa Patriot Health?</h2>
+            <h2 className="text-3xl md:text-4xl font-heading font-extrabold text-neutral">Mengapa Patriot ITS?</h2>
             <p className="text-neutral-500 mt-4">Solusi kesehatan digital terpadu untuk kesejahteraan Anda.</p>
           </div>
 

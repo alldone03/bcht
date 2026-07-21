@@ -97,26 +97,51 @@ export default function Login({ onLoginSuccess }) {
           {/* Quick Login Options Helper */}
           <div className="mt-6 bg-base-200/60 p-3 rounded-xl border border-base-200 text-xs">
             <p className="font-semibold text-neutral mb-2">Akun Uji Coba Quick Login:</p>
-            <div className="flex flex-col gap-1 text-[11px] font-mono">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px] font-mono">
               <button 
                 onClick={() => { setEmail('dokter@patriot.com'); setPassword('password'); }} 
                 className="text-left text-primary hover:underline"
               >
-                🏥 Dokter: dokter@patriot.com (password)
+                🏥 Dokter: dokter@patriot.com
               </button>
               <button 
                 onClick={() => { setEmail('peserta@patriot.com'); setPassword('password'); }} 
                 className="text-left text-secondary hover:underline"
               >
-                👤 Peserta: peserta@patriot.com (password)
+                👤 Peserta: peserta@patriot.com
               </button>
               <button 
                 onClick={() => { setEmail('admin@patriot.com'); setPassword('password'); }} 
                 className="text-left text-neutral hover:underline"
               >
-                ⚙️ Admin: admin@patriot.com (password)
+                ⚙️ Admin: admin@patriot.com
+              </button>
+              <button 
+                onClick={() => { setEmail('yusuf@patriot.com'); setPassword('password'); }} 
+                className="text-left text-accent hover:underline"
+              >
+                📋 PJ Tim: yusuf@patriot.com
+              </button>
+              <button 
+                onClick={() => { setEmail('timkes@patriot.com'); setPassword('password'); }} 
+                className="text-left text-info hover:underline"
+              >
+                ❤️ Tim Kes: timkes@patriot.com
+              </button>
+              <button 
+                onClick={() => { setEmail('petugas@patriot.com'); setPassword('password'); }} 
+                className="text-left text-warning hover:underline"
+              >
+                🛡️ Petugas: petugas@patriot.com
+              </button>
+              <button 
+                onClick={() => { setEmail('pendamping@patriot.com'); setPassword('password'); }} 
+                className="text-left text-success hover:underline"
+              >
+                🤝 Pendamping: pendamping@patriot.com
               </button>
             </div>
+            <p className="text-[10px] text-neutral-400 mt-2 italic text-center">Kata sandi untuk semua akun uji coba: password</p>
           </div>
 
           <div className="text-center mt-6">

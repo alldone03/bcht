@@ -36,7 +36,7 @@ class ChatController extends Controller
         DB::table('chat_messages')->insert([
             'session_id' => $sessionId,
             'role' => 'ASSISTANT',
-            'message' => 'Halo! Saya Patriot AI. Tanyakan kepada saya keluhan Anda, gejala kesehatan, atau mintalah bantuan untuk menjelaskan riwayat screening M-EWS Anda.',
+            'message' => 'Halo! Saya Patriot AI. Tanyakan kepada saya keluhan Anda atau gejala kesehatan yang Anda rasakan.',
             'token_usage' => 40,
             'created_at' => now(),
             'updated_at' => now(),
