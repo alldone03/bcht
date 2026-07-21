@@ -52,6 +52,7 @@ services:
         condition: service_started
     networks:
       - patriot-prod-network
+      - web
 
   queue-worker:
     build:
