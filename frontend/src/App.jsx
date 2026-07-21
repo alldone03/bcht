@@ -22,10 +22,9 @@ function DashboardWrapper({ currentUser, activeTab, setActiveTab }) {
         return <AdminDashboard />;
       case 'DOKTER':
         return <DokterDashboard user={currentUser} activeTab={activeTab} setActiveTab={setActiveTab} />;
-      case 'PESERTA':
-        return <PesertaDashboard user={currentUser} activeTab={activeTab} setActiveTab={setActiveTab} />;
       default:
-        return <Navigate to="/" replace />;
+        // All field/participant/companion roles use the PesertaDashboard to fill forms
+        return <PesertaDashboard user={currentUser} activeTab={activeTab} setActiveTab={setActiveTab} />;
     }
   };
 

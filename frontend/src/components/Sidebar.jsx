@@ -30,7 +30,7 @@ export default function Sidebar({ role, activeTab, setActiveTab }) {
     ]
   };
 
-  const currentMenu = menuItems[role] || [];
+  const currentMenu = menuItems[role] || menuItems['PESERTA'] || [];
 
   return (
     <div className="w-64 bg-base-100 min-h-[calc(100vh-4rem)] shadow-xl p-4 hidden md:flex flex-col justify-between border-r border-base-200">

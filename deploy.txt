@@ -7,14 +7,22 @@ Ikuti langkah-langkah di bawah ini untuk mendeploy aplikasi menggunakan Docker C
 
    *Sesuaikan konfigurasi DB, Redis, APP_KEY, dan kunci API OpenAI di file .env.*
 
-2. Bangun dan jalankan kontainer Docker dalam mode daemon (latar belakang):
+2. Persiapkan SSL Certificate (Let's Encrypt / Certbot):
+   Karena nginx.conf dikonfigurasi menggunakan SSL, pastikan folder di bawah ini sudah berisi sertifikat Anda:
+   ./certbot/conf/live/patriot.insamo.id/fullchain.pem
+   ./certbot/conf/live/patriot.insamo.id/privkey.pem
+
+   *Tip untuk instalasi pertama kali (jika belum ada sertifikat):*
+   Anda dapat membuat sertifikat dummy/self-signed sementara agar Nginx tidak gagal mulai (crash) saat pertama kali dijalankan, kemudian jalankan certbot untuk mendapatkan sertifikat resmi Let's Encrypt.
+
+3. Bangun dan jalankan kontainer Docker dalam mode daemon (latar belakang):
    docker compose -f docker-compose.prod.yml up -d --build
 
-3. Jalankan migrasi database di kontainer backend secara paksa:
+4. Jalankan migrasi database di kontainer backend secara paksa:
    docker compose -f docker-compose.prod.yml exec backend php artisan migrate --force
 
-4. Periksa status kontainer yang sedang berjalan:
+5. Periksa status kontainer yang sedang berjalan:
    docker compose -f docker-compose.prod.yml ps
 
-5. Pantau log antrean pesan (Queue Worker) secara real-time:
+6. Pantau log antrean pesan (Queue Worker) secara real-time:
    docker compose -f docker-compose.prod.yml logs -f queue-worker

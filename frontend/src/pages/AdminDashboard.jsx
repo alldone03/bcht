@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { api } from '../api';
 import { Users, FileSpreadsheet, Plus, Trash2, ShieldCheck, Mail, UserPlus, Edit2, Calendar, Hash } from 'lucide-react';
 
@@ -8,6 +8,11 @@ export default function AdminDashboard() {
   const [responses, setResponses] = useState([]);
   const [loading, setLoading] = useState(false);
   
+  // Search & Sort state
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortField, setSortField] = useState('name');
+  const [sortDirection, setSortDirection] = useState('asc');
+
   // Create state
   const [showAddModal, setShowAddModal] = useState(false);
   const [newName, setNewName] = useState('');
@@ -46,6 +51,49 @@ export default function AdminDashboard() {
       setLoading(false);
     }
   };
+
+  const handleRequestSort = (field) => {
+    const isAsc = sortField === field && sortDirection === 'asc';
+    setSortDirection(isAsc ? 'desc' : 'asc');
+    setSortField(field);
+  };
+
+  const filteredAndSortedUsers = useMemo(() => {
+    let result = [...users];
+
+    // Filter
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      result = result.filter(u => 
+        (u.name && u.name.toLowerCase().includes(q)) || 
+        (u.email && u.email.toLowerCase().includes(q)) || 
+        (u.participant_id && u.participant_id.toLowerCase().includes(q))
+      );
+    }
+
+    // Sort
+    result.sort((a, b) => {
+      let valA = '';
+      let valB = '';
+
+      if (sortField === 'role') {
+        valA = a.role && a.role.name ? a.role.name : (a.role || '');
+        valB = b.role && b.role.name ? b.role.name : (b.role || '');
+      } else {
+        valA = a[sortField] || '';
+        valB = b[sortField] || '';
+      }
+
+      if (typeof valA === 'string') valA = valA.toLowerCase();
+      if (typeof valB === 'string') valB = valB.toLowerCase();
+
+      if (valA < valB) return sortDirection === 'asc' ? -1 : 1;
+      if (valA > valB) return sortDirection === 'asc' ? 1 : -1;
+      return 0;
+    });
+
+    return result;
+  }, [users, searchQuery, sortField, sortDirection]);
 
   const handleAddUser = async (e) => {
     e.preventDefault();
@@ -130,6 +178,25 @@ export default function AdminDashboard() {
     }
   };
 
+  const renderSortableHeader = (label, field) => {
+    const isCurrent = sortField === field;
+    return (
+      <th 
+        onClick={() => handleRequestSort(field)} 
+        className="cursor-pointer hover:bg-base-200 select-none transition-colors py-3"
+      >
+        <div className="flex items-center gap-1">
+          {label}
+          {isCurrent ? (
+            sortDirection === 'asc' ? '▲' : '▼'
+          ) : (
+            <span className="opacity-30">↕</span>
+          )}
+        </div>
+      </th>
+    );
+  };
+
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -187,27 +254,36 @@ export default function AdminDashboard() {
           {/* Users Management */}
           <div className="card bg-base-100 shadow-xl border border-base-200">
             <div className="card-body">
-              <div className="flex justify-between items-center mb-6">
+              <div className="flex flex-col sm:flex-row gap-4 justify-between items-stretch sm:items-center mb-6">
                 <h3 className="font-heading font-bold text-lg text-neutral">Daftar Pengguna Sistem</h3>
-                <button onClick={() => setShowAddModal(true)} className="btn btn-primary btn-sm rounded-xl font-bold gap-1 px-4">
-                  <UserPlus className="w-4 h-4" /> Tambah User
-                </button>
+                <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center flex-1 max-w-xl justify-end">
+                  <input
+                    type="text"
+                    placeholder="Cari nama, email, atau ID..."
+                    className="input input-bordered input-sm rounded-xl text-xs w-full sm:max-w-xs focus:outline-none"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                  <button onClick={() => setShowAddModal(true)} className="btn btn-primary btn-sm rounded-xl font-bold gap-1 px-4 text-white">
+                    <UserPlus className="w-4 h-4" /> Tambah User
+                  </button>
+                </div>
               </div>
 
               <div className="overflow-x-auto w-full">
                 <table className="table w-full">
                   <thead>
                     <tr>
-                      <th>Nama Lengkap</th>
-                      <th>Email / ID Peserta</th>
-                      <th>Tanggal Lahir</th>
-                      <th>Role</th>
-                      <th>Tanggal Daftar</th>
+                      {renderSortableHeader('Nama Lengkap', 'name')}
+                      {renderSortableHeader('Email / ID Peserta', 'email')}
+                      {renderSortableHeader('Tanggal Lahir', 'tanggal_lahir')}
+                      {renderSortableHeader('Role', 'role')}
+                      {renderSortableHeader('Tanggal Daftar', 'created_at')}
                       <th>Aksi</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {users.map((user) => {
+                    {filteredAndSortedUsers.map((user) => {
                       const currentRoleName = user.role && user.role.name ? user.role.name : (user.role || 'PESERTA');
                       return (
                         <tr key={user.id} className="hover">
@@ -261,6 +337,13 @@ export default function AdminDashboard() {
                         </tr>
                       );
                     })}
+                    {filteredAndSortedUsers.length === 0 && (
+                      <tr>
+                        <td colSpan="6" className="text-center py-8 text-neutral-500 text-xs">
+                          Tidak ada pengguna ditemukan.
+                        </td>
+                      </tr>
+                    )}
                   </tbody>
                 </table>
               </div>
